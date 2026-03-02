@@ -1,0 +1,2393 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PowerMatch EPS">
+<meta name="theme-color" content="#07091a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="logo.png">
+<title>PowerMatch EPS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07091a; --bg2:#0d1226; --bg3:#121c35;
+  --gold:#f0c040; --ora:#ff6b2b; --blu:#00d4ff;
+  --grn:#00ff88; --red:#ff3366; --pur:#b44fff;
+  --t1:#ffffff; --t2:#7a90b8; --t3:#3a4d70;
+  --brd:rgba(0,212,255,.18);
+  --ff:'Bebas Neue',cursive;
+  --fu:'Rajdhani',sans-serif;
+  --ft:'Orbitron',monospace;
+  --r:14px; --rl:22px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:var(--fu)}
+body{background:var(--bg);color:var(--t1);
+  background-image:radial-gradient(ellipse at 15% 5%,rgba(0,80,200,.12) 0%,transparent 55%),
+  radial-gradient(ellipse at 85% 95%,rgba(150,50,255,.08) 0%,transparent 55%)}
+
+/* ── SPLASH ──────────────────────────────── */
+#splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s,transform .8s}
+#splash.hide{opacity:0;transform:scale(1.05);pointer-events:none}
+.sp-ico{width:120px;height:120px;border-radius:28px;background:linear-gradient(135deg,var(--gold),var(--ora));display:flex;align-items:center;justify-content:center;font-size:60px;box-shadow:0 0 80px rgba(240,192,64,.5);animation:spPulse 2s ease-in-out infinite;margin-bottom:22px}
+@keyframes spPulse{0%,100%{box-shadow:0 0 80px rgba(240,192,64,.5)}50%{box-shadow:0 0 120px rgba(240,192,64,.85)}}
+.sp-title{font-family:var(--ff);font-size:52px;letter-spacing:5px;color:var(--gold)}
+.sp-sub{font-family:var(--ft);font-size:10px;letter-spacing:6px;color:var(--t2);margin-top:5px}
+.sp-bar{width:200px;height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:40px;overflow:hidden}
+.sp-prog{height:100%;background:linear-gradient(90deg,var(--blu),var(--gold));animation:spLoad 2.2s ease forwards}
+@keyframes spLoad{from{width:0}to{width:100%}}
+
+/* ── APP / SCREENS ───────────────────────── */
+#app{display:none;flex-direction:column;height:100vh;overflow:hidden}
+#app.on{display:flex}
+.screen{display:none;flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.screen.on{display:block;animation:fadeUp .28s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HOME ────────────────────────────────── */
+#homeScreen{display:none;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:18px}
+#homeScreen.on{display:flex}
+.h-logo{width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,var(--gold),var(--ora));display:flex;align-items:center;justify-content:center;font-size:42px;box-shadow:0 0 40px rgba(240,192,64,.4);margin-bottom:10px}
+.h-title{font-family:var(--ff);font-size:40px;letter-spacing:4px;color:var(--gold)}
+.h-sub{font-family:var(--ft);font-size:9px;letter-spacing:5px;color:var(--t2);margin-bottom:24px}
+.mode-grid{display:flex;flex-direction:column;gap:11px;width:100%;max-width:440px}
+.mc{border-radius:var(--rl);border:2px solid transparent;background:var(--bg2);cursor:pointer;transition:transform .18s,box-shadow .18s;overflow:hidden}
+.mc:active{transform:scale(.97)}
+.mc-inner{display:flex;align-items:center;height:78px}
+.mc-ico{width:78px;height:78px;display:flex;align-items:center;justify-content:center;font-size:38px;flex-shrink:0}
+.mc-txt{flex:1;padding:0 16px}
+.mc-name{font-family:var(--ff);font-size:24px;letter-spacing:2px;line-height:1}
+.mc-desc{font-size:11px;color:var(--t2);margin-top:3px}
+.mc-arr{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;margin-right:13px;flex-shrink:0}
+.mc-match{border-color:rgba(0,212,255,.3)}.mc-match .mc-ico{background:rgba(0,212,255,.07)}.mc-match .mc-name{color:var(--blu)}.mc-match .mc-arr{background:rgba(0,212,255,.18);color:var(--blu)}.mc-match:hover{box-shadow:0 6px 30px rgba(0,212,255,.18);transform:translateY(-2px)}
+.mc-rank{border-color:rgba(240,192,64,.3)}.mc-rank .mc-ico{background:rgba(240,192,64,.07)}.mc-rank .mc-name{color:var(--gold)}.mc-rank .mc-arr{background:rgba(240,192,64,.18);color:var(--gold)}.mc-rank:hover{box-shadow:0 6px 30px rgba(240,192,64,.16);transform:translateY(-2px)}
+.mc-stats{border-color:rgba(0,255,136,.3)}.mc-stats .mc-ico{background:rgba(0,255,136,.07)}.mc-stats .mc-name{color:var(--grn)}.mc-stats .mc-arr{background:rgba(0,255,136,.18);color:var(--grn)}.mc-stats:hover{box-shadow:0 6px 30px rgba(0,255,136,.16);transform:translateY(-2px)}
+.mc-reg{border-color:rgba(180,79,255,.3)}.mc-reg .mc-ico{background:rgba(180,79,255,.07)}.mc-reg .mc-name{color:var(--pur)}.mc-reg .mc-arr{background:rgba(180,79,255,.18);color:var(--pur)}.mc-reg:hover{box-shadow:0 6px 30px rgba(180,79,255,.16);transform:translateY(-2px)}
+
+/* ── SCREEN HEADER ───────────────────────── */
+.scr-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;position:sticky;top:0;z-index:50;background:rgba(7,9,26,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--brd)}
+.back-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--brd);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--t2);flex-shrink:0}
+.hdr-title{font-family:var(--ff);font-size:22px;letter-spacing:2px}
+.hdr-sub{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--t2);margin-top:1px}
+.hdr-right{margin-left:auto;display:flex;gap:7px;align-items:center}
+.bp{padding:13px;padding-bottom:44px}
+
+/* ── CARDS ───────────────────────────────── */
+.card{background:var(--bg3);border:1px solid var(--brd);border-radius:var(--rl);padding:16px;margin-bottom:12px}
+.ctitle{font-family:var(--ft);font-size:10px;letter-spacing:2.5px;color:var(--blu);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.ctitle::after{content:'';flex:1;height:1px;background:var(--brd)}
+hr.d{border:none;border-top:1px solid var(--brd);margin:12px 0}
+
+/* ── INPUTS ──────────────────────────────── */
+.ig{margin-bottom:10px}
+.il{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2);margin-bottom:4px;display:block}
+.inp{width:100%;padding:9px 12px;background:rgba(255,255,255,.05);border:1px solid var(--brd);border-radius:var(--r);color:var(--t1);font-family:var(--fu);font-size:14px;font-weight:600;outline:none;transition:border-color .2s}
+.inp:focus{border-color:var(--blu)}
+select.inp option{background:var(--bg2)}
+.chk-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(255,255,255,.04);border:1px solid var(--brd);border-radius:var(--r);cursor:pointer}
+.chk-row input[type=checkbox]{width:17px;height:17px;accent-color:var(--gold);cursor:pointer}
+.chk-row label{font-size:13px;font-weight:600;cursor:pointer;flex:1}
+.crow{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
+.csw{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;flex-shrink:0}
+.csw.on{border-color:#fff;box-shadow:0 0 7px rgba(255,255,255,.4)}
+
+/* ── BUTTONS ─────────────────────────────── */
+.btn{padding:9px 15px;border:none;border-radius:var(--r);font-family:var(--fu);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .16s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn:active:not(:disabled){transform:scale(.95)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-block{width:100%;justify-content:center}
+.btn-sm{padding:6px 11px;font-size:11px}
+.btn-xs{padding:4px 8px;font-size:10px;border-radius:8px}
+.btn-blu{background:linear-gradient(135deg,var(--blu),#0055ee);color:#fff;box-shadow:0 3px 14px rgba(0,100,255,.25)}
+.btn-gld{background:linear-gradient(135deg,var(--gold),var(--ora));color:#07091a;box-shadow:0 3px 14px rgba(240,192,64,.25)}
+.btn-red{background:linear-gradient(135deg,var(--red),#aa0022);color:#fff}
+.btn-grn{background:linear-gradient(135deg,var(--grn),#00bb55);color:#07091a}
+.btn-gst{background:rgba(255,255,255,.07);color:var(--t2);border:1px solid var(--brd)}
+.btn-gst:hover{background:rgba(255,255,255,.12);color:var(--t1)}
+.btn-pur{background:linear-gradient(135deg,var(--pur),#7700cc);color:#fff}
+
+/* ── GRID / TABS ─────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.itabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.itab{padding:6px 13px;border-radius:20px;border:1px solid var(--brd);background:transparent;color:var(--t2);font-family:var(--fu);font-size:11px;font-weight:600;cursor:pointer;letter-spacing:.8px;text-transform:uppercase;transition:all .18s;flex-shrink:0}
+.itab.on{background:rgba(0,212,255,.14);color:var(--blu);border-color:rgba(0,212,255,.3)}
+
+/* ── TAGS ────────────────────────────────── */
+.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.7px}
+.tg-blu{background:rgba(0,212,255,.13);color:var(--blu);border:1px solid rgba(0,212,255,.28)}
+.tg-gld{background:rgba(240,192,64,.13);color:var(--gold);border:1px solid rgba(240,192,64,.28)}
+.tg-grn{background:rgba(0,255,136,.13);color:var(--grn);border:1px solid rgba(0,255,136,.28)}
+.tg-red{background:rgba(255,51,102,.13);color:var(--red);border:1px solid rgba(255,51,102,.28)}
+.tg-pur{background:rgba(180,79,255,.13);color:var(--pur);border:1px solid rgba(180,79,255,.28)}
+
+/* ── PCHIPS ──────────────────────────────── */
+.pchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.pchip{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px}
+.pchip .rm{color:var(--red);cursor:pointer;font-size:13px;line-height:1}
+.team-item{background:rgba(255,255,255,.03);border:1px solid var(--brd);border-radius:var(--r);padding:11px 12px;margin-bottom:8px;display:flex;align-items:center;gap:9px}
+.tbadge{width:34px;height:34px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+
+/* ── CONNECTION ──────────────────────────── */
+.cdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cdot.ok{background:var(--grn);animation:pulse 2s infinite}
+.cdot.err{background:var(--red)}
+.cdot.wait{background:var(--gold);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── MATCH ───────────────────────────────── */
+.arena{padding:10px 11px 0}
+.teams-bar{display:grid;grid-template-columns:1fr 54px 1fr;align-items:start;gap:6px;margin-bottom:8px}
+.tcol{display:flex;flex-direction:column;align-items:center;text-align:center}
+.tc-name{font-family:var(--ff);font-size:18px;letter-spacing:1.5px;line-height:1.1;margin-bottom:2px}
+.tc-score{font-family:var(--ft);font-size:50px;font-weight:900;line-height:1}
+.sc-a{color:var(--blu);text-shadow:0 0 24px rgba(0,212,255,.4)}
+.sc-b{color:var(--ora);text-shadow:0 0 24px rgba(255,107,43,.4)}
+.tc-break{font-size:9px;color:var(--t3);margin-top:2px}
+.pw-slot{margin-top:6px;display:flex;flex-direction:column;gap:3px;width:100%;min-height:24px}
+.pw-chip{display:flex;align-items:center;gap:4px;padding:4px 7px;border-radius:8px;font-size:10px;font-weight:600;border:1px solid;width:100%;animation:chipIn .35s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes chipIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+.pw-chip.positive{background:rgba(0,255,136,.09);color:var(--grn);border-color:rgba(0,255,136,.28)}
+.pw-chip.negative{background:rgba(255,51,102,.09);color:var(--red);border-color:rgba(255,51,102,.28)}
+.pw-chip .pc-txt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pw-chip .pc-rev{font-size:12px;cursor:pointer;opacity:.55;flex-shrink:0}
+.pw-chip .pc-rev:hover{opacity:1}
+.vscol{display:flex;flex-direction:column;align-items:center;padding-top:20px}
+.vs-txt{font-family:var(--ff);font-size:18px;color:var(--t3)}
+.pd-badge{font-family:var(--ft);font-size:8px;letter-spacing:1.5px;color:var(--t2);text-align:center}
+
+/* timer */
+.timer-blk{text-align:center;margin-bottom:9px;padding:0 11px}
+.timer-big{font-family:var(--ft);font-size:60px;font-weight:900;color:var(--gold);line-height:1;text-shadow:0 0 30px rgba(240,192,64,.4)}
+.timer-big.warn{color:var(--ora)}
+.timer-big.danger{color:var(--red);animation:tdgr .5s infinite}
+@keyframes tdgr{0%,100%{opacity:1}50%{opacity:.5}}
+.timer-btns{display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:10px;padding:0 11px;flex-wrap:wrap}
+.tbtn{width:46px;height:46px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all .16s;flex-shrink:0}
+.tbtn:active{transform:scale(.88)!important}
+.tbtn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.tbtn-play{background:linear-gradient(135deg,var(--grn),#00bb55)}
+.tbtn-stop{background:linear-gradient(135deg,var(--red),#bb0022)}
+.tbtn-reset{background:rgba(255,255,255,.09);color:var(--t2)}
+.tbtn-wide{height:46px;border:none;border-radius:23px;font-family:var(--fu);font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .16s;padding:0 14px;white-space:nowrap}
+.tbtn-wide:active{transform:scale(.9)!important}
+.tbtn-wide:disabled{opacity:.35;cursor:not-allowed}
+.tbtn-tout{background:linear-gradient(135deg,var(--gold),var(--ora));color:#07091a}
+.tbtn-end{background:linear-gradient(135deg,var(--red),#880011);color:#fff}
+
+/* score panels */
+.sc-panels{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 11px;margin-bottom:9px}
+.sp{border-radius:var(--rl);padding:10px;border:1px solid}
+.sp.A{background:rgba(0,212,255,.04);border-color:rgba(0,212,255,.18)}
+.sp.B{background:rgba(255,107,43,.04);border-color:rgba(255,107,43,.18)}
+.sp-lbl{font-family:var(--ft);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.sp.A .sp-lbl{color:var(--blu)}.sp.B .sp-lbl{color:var(--ora)}
+.pr{display:flex;align-items:center;gap:3px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.pr:last-child{border-bottom:none}
+.pr-name{font-size:11px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pr-pts{font-family:var(--ft);font-size:11px;font-weight:700;min-width:26px;text-align:right}
+.sbtns{display:flex;gap:2px}
+.sbtn{width:22px;height:22px;border-radius:5px;border:none;font-size:8px;font-weight:700;cursor:pointer;font-family:var(--ft);transition:transform .1s}
+.sbtn-1{background:rgba(0,255,136,.16);color:var(--grn)}
+.sbtn-10{background:rgba(0,212,255,.16);color:var(--blu)}
+.sbtn-100{background:rgba(240,192,64,.16);color:var(--gold)}
+.sbtn:active{transform:scale(.8)}
+.m-row{display:flex;gap:6px;margin-top:6px}
+.m-inp{flex:1;padding:6px 8px;background:rgba(255,255,255,.06);border:1px solid var(--brd);border-radius:8px;color:var(--t1);font-family:var(--ft);font-size:12px;font-weight:700;outline:none;text-align:center}
+.m-set{padding:6px 10px;border:none;border-radius:8px;font-family:var(--fu);font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.8px;text-transform:uppercase}
+.sp.A .m-set{background:rgba(0,212,255,.18);color:var(--blu)}
+.sp.B .m-set{background:rgba(255,107,43,.18);color:var(--ora)}
+
+/* draw + bonus */
+.draw-bar{padding:0 11px 9px}
+.bonus-row{padding:0 11px 9px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.bonus-btn{padding:12px 8px;border:2px solid;border-radius:var(--r);font-family:var(--ft);font-size:11px;font-weight:700;letter-spacing:.8px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;overflow:hidden;background:transparent}
+.bonus-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.06) 50%,transparent 60%);animation:bShine 2.8s ease-in-out infinite}
+@keyframes bShine{0%,100%{transform:translateX(-150%)}50%{transform:translateX(150%)}}
+.bonus-btn.A{border-color:rgba(0,212,255,.45);color:var(--blu)}
+.bonus-btn.B{border-color:rgba(255,107,43,.45);color:var(--ora)}
+.bonus-btn:active{transform:scale(.93)!important}
+.bonus-bval{font-size:20px;font-weight:900}
+
+/* ── RANKING ──────────────────────────────── */
+.rtable{width:100%;border-collapse:separate;border-spacing:0 4px}
+.rtable th{font-family:var(--ft);font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--t3);padding:5px 9px;text-align:left}
+.rtable td{padding:9px 8px;background:var(--bg3);border-top:1px solid var(--brd);border-bottom:1px solid var(--brd)}
+.rtable td:first-child{border-left:1px solid var(--brd);border-radius:var(--r) 0 0 var(--r)}
+.rtable td:last-child{border-right:1px solid var(--brd);border-radius:0 var(--r) var(--r) 0}
+.rk-pos{font-family:var(--ft);font-size:16px;font-weight:700;color:var(--t3);width:28px}
+.rk-pos.g{color:#ffd700}.rk-pos.s{color:#c0c0c0}.rk-pos.b{color:#cd7f32}
+.rk-stat{font-family:var(--ft);font-size:11px;font-weight:700;text-align:right}
+.rk-stat.pts{color:var(--gold)}.rk-stat.v{color:var(--grn)}.rk-stat.d{color:var(--red)}.rk-stat.p{color:var(--t2);font-size:10px}
+.mh-item{display:flex;align-items:center;gap:8px;padding:9px 11px;background:var(--bg3);border:1px solid var(--brd);border-radius:var(--r);margin-bottom:6px}
+
+/* ── STATS ────────────────────────────────── */
+.sb-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
+.sb-box{background:var(--bg3);border:1px solid var(--brd);border-radius:var(--r);padding:12px;text-align:center}
+.sb-val{font-family:var(--ft);font-size:24px;font-weight:700;margin-bottom:2px}
+.sb-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2)}
+.pstat{background:var(--bg3);border:1px solid var(--brd);border-radius:var(--r);padding:12px;margin-bottom:8px}
+.ps-hdr{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.ps-rank{font-family:var(--ft);font-size:14px;font-weight:700;color:var(--t3);width:22px;text-align:center;flex-shrink:0}
+.ps-rank.g{color:#ffd700}.ps-rank.s{color:#c0c0c0}.ps-rank.b{color:#cd7f32}
+.ps-total{text-align:center;background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.22);border-radius:10px;padding:5px 11px}
+.ps-total-n{font-family:var(--ft);font-size:20px;font-weight:900;color:var(--gold);line-height:1}
+.ps-total-l{font-size:8px;color:var(--t2);letter-spacing:.8px;margin-top:1px}
+.act-bar{display:flex;border-radius:6px;overflow:hidden;height:9px;gap:1px;margin-bottom:6px}
+.act-bar div{min-width:2px}
+.act-pills{display:flex;gap:5px;flex-wrap:wrap}
+.act-pill{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;border:1px solid}
+.ap-ora{background:rgba(255,107,43,.09);border-color:rgba(255,107,43,.25)}
+.ap-grn{background:rgba(0,255,136,.09);border-color:rgba(0,255,136,.25)}
+.ap-blu{background:rgba(0,212,255,.09);border-color:rgba(0,212,255,.25)}
+.ap-gld{background:rgba(240,192,64,.09);border-color:rgba(240,192,64,.25)}
+.act-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.act-n{font-family:var(--ft);font-size:11px;font-weight:700}
+.act-l{font-size:10px;color:var(--t2)}
+.act-p{font-size:9px;color:var(--t3)}
+
+/* ── POWERS EDITOR ────────────────────────── */
+.pw-item{display:flex;align-items:center;gap:9px;padding:8px 11px;background:rgba(255,255,255,.03);border:1px solid var(--brd);border-radius:10px;margin-bottom:5px}
+.pw-name{font-size:12px;font-weight:700;flex:1}
+.pw-desc{font-size:10px;color:var(--t2)}
+.imt-tab{padding:6px 14px;border-radius:20px;border:1px solid var(--brd);background:transparent;color:var(--t2);font-family:var(--fu);font-size:11px;font-weight:600;cursor:pointer;transition:all .18s}
+.imt-tab.on{background:rgba(240,192,64,.14);color:var(--gold);border-color:rgba(240,192,64,.32)}
+.lib-filter{padding:4px 11px;border-radius:20px;border:1px solid var(--brd);background:transparent;color:var(--t3);font-family:var(--fu);font-size:10px;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap}
+.lib-filter.on{background:rgba(0,212,255,.13);color:var(--blu);border-color:rgba(0,212,255,.32)}
+.lib-filter[data-t=pos].on{background:rgba(0,255,136,.13);color:var(--grn);border-color:rgba(0,255,136,.32)}
+.lib-filter[data-t=neg].on{background:rgba(255,51,102,.13);color:var(--red);border-color:rgba(255,51,102,.32)}
+.mypow-sec{font-family:var(--ft);font-size:9px;letter-spacing:1.5px;color:var(--t3);text-transform:uppercase;padding:7px 0 3px;border-bottom:1px solid var(--brd);margin-bottom:5px}
+.mypow-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(240,192,64,.03);border:1px solid rgba(240,192,64,.16);border-radius:10px;margin-bottom:5px}
+
+/* ── ICON GALLERY ─────────────────────────── */
+.ig-ov{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.92);backdrop-filter:blur(14px);display:none;flex-direction:column;padding:18px}
+.ig-ov.on{display:flex}
+.ig-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;overflow-y:auto;flex:1;padding-bottom:8px}
+.ig-item{aspect-ratio:1;border-radius:11px;border:2px solid var(--brd);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:24px;transition:all .18s}
+.ig-item:hover,.ig-item.on{border-color:var(--gold);background:rgba(240,192,64,.12);transform:scale(1.06)}
+.ig-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.ig-cat{padding:5px 11px;border-radius:20px;border:1px solid var(--brd);background:transparent;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;transition:all .18s}
+.ig-cat.on{background:rgba(240,192,64,.14);color:var(--gold);border-color:rgba(240,192,64,.3)}
+.svg-icon{width:26px;height:26px}
+
+/* ── OVERLAYS / MODALS ───────────────────── */
+.ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:16px}
+.ov.on{display:flex}
+.ov-box{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rl);padding:18px;width:100%;max-width:370px}
+.pw-choose-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.pwc-btn{padding:14px 7px;border-radius:var(--r);border:2px solid;background:transparent;cursor:pointer;text-align:center;font-family:var(--fu);transition:all .18s}
+.pwc-btn.pos{border-color:rgba(0,255,136,.4);color:var(--grn)}.pwc-btn.pos:hover{background:rgba(0,255,136,.08)}
+.pwc-btn.neg{border-color:rgba(255,51,102,.4);color:var(--red)}.pwc-btn.neg:hover{background:rgba(255,51,102,.08)}
+
+/* power card */
+.pw-card{width:260px;border-radius:18px;overflow:hidden;position:relative;box-shadow:0 18px 60px rgba(0,0,0,.8)}
+.pw-card.pos{background:linear-gradient(160deg,#0a2a1a,#051512);border:2px solid rgba(0,255,136,.45)}
+.pw-card.neg{background:linear-gradient(160deg,#2a0a14,#150508);border:2px solid rgba(255,51,102,.45)}
+.pwcard-hdr{padding:12px 16px 7px;display:flex;align-items:center;justify-content:space-between}
+.pwcard-badge{font-family:var(--ft);font-size:8px;letter-spacing:2.5px;padding:3px 8px;border-radius:20px;font-weight:700}
+.pw-card.pos .pwcard-badge{background:rgba(0,255,136,.18);color:var(--grn);border:1px solid rgba(0,255,136,.36)}
+.pw-card.neg .pwcard-badge{background:rgba(255,51,102,.18);color:var(--red);border:1px solid rgba(255,51,102,.36)}
+.pwcard-art{width:100%;height:110px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pw-card.pos .pwcard-art{background:linear-gradient(180deg,rgba(0,255,136,.08),transparent)}
+.pw-card.neg .pwcard-art{background:linear-gradient(180deg,rgba(255,51,102,.08),transparent)}
+.pwcard-body{padding:10px 16px 16px}
+.pwcard-name{font-family:var(--ff);font-size:24px;letter-spacing:2px;line-height:1.1;margin-bottom:4px}
+.pw-card.pos .pwcard-name{color:var(--grn)}.pw-card.neg .pwcard-name{color:var(--red)}
+.pwcard-desc{font-size:11px;color:rgba(255,255,255,.7);line-height:1.45;margin-bottom:6px}
+.pwcard-dur{font-size:9px;letter-spacing:1.5px;font-family:var(--ft);padding:3px 7px;border-radius:5px;display:inline-block;margin-bottom:9px}
+.pw-card.pos .pwcard-dur{background:rgba(0,255,136,.1);color:var(--grn)}
+.pw-card.neg .pwcard-dur{background:rgba(255,51,102,.1);color:var(--red)}
+.pw-shine{position:absolute;inset:0;pointer-events:none;background:linear-gradient(130deg,transparent 30%,rgba(255,255,255,.06) 50%,transparent 70%);animation:shine 3s ease-in-out infinite}
+@keyframes shine{0%,100%{transform:translateX(-100%)}50%{transform:translateX(100%)}}
+@keyframes cardReveal{from{opacity:0;transform:scale(.3) rotateY(180deg)}60%{transform:scale(1.05) rotateY(-4deg)}to{opacity:1;transform:scale(1) rotateY(0)}}
+.card-reveal-wrap{animation:cardReveal .55s cubic-bezier(.175,.885,.32,1.275)}
+
+/* halftime */
+.ht-ov{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.92);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px}
+.ht-ov.on{display:flex}
+.ht-title{font-family:var(--ff);font-size:52px;letter-spacing:4px;color:var(--gold);animation:htP 1s ease-in-out infinite}
+@keyframes htP{0%,100%{text-shadow:0 0 36px rgba(240,192,64,.9)}50%{text-shadow:none;opacity:.65}}
+
+/* endgame */
+.eg-ov{position:fixed;inset:0;z-index:450;background:rgba(0,0,0,.95);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px}
+.eg-ov.on{display:flex}
+.eg-trophy{font-size:82px;animation:tBounce .7s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes tBounce{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
+
+/* bonus confirm */
+.bc-ov{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:18px}
+.bc-ov.on{display:flex}
+
+/* ── TOAST ───────────────────────────────── */
+.toaster{position:fixed;top:10px;right:10px;z-index:800;display:flex;flex-direction:column;gap:5px;pointer-events:none}
+.toast{background:var(--bg3);border:1px solid var(--brd);border-radius:var(--r);padding:8px 12px;font-size:12px;font-weight:600;animation:tin .28s ease;max-width:240px;pointer-events:auto}
+@keyframes tin{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
+.toast.ok{border-color:rgba(0,255,136,.38);color:var(--grn)}
+.toast.warn{border-color:rgba(240,192,64,.38);color:var(--gold)}
+.toast.err{border-color:rgba(255,51,102,.38);color:var(--red)}
+.toast.info{border-color:rgba(0,212,255,.38);color:var(--blu)}
+
+.empty{text-align:center;padding:28px 14px;color:var(--t3)}
+.empty .ei{font-size:40px;margin-bottom:8px}
+.empty p{font-size:12px;line-height:1.6}
+
+@media(min-width:560px){.bp,.arena,.sc-panels,.timer-btns,.draw-bar,.bonus-row{max-width:580px;margin-left:auto;margin-right:auto}.mode-grid{max-width:480px}}
+@media(max-width:360px){.tc-score{font-size:40px}.timer-big{font-size:50px}.ig-grid{grid-template-columns:repeat(5,1fr)}.sc-panels{grid-template-columns:1fr}.pw-card{width:88vw}}
+
+/* ── CLASS PICKER ────────────────────────── */
+#classPickScreen{display:none;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:18px;overflow-y:auto}
+#classPickScreen.on{display:flex}
+.cls-card{width:100%;max-width:440px;background:var(--bg2);border:2px solid var(--brd);border-radius:var(--rl);padding:14px 16px;margin-bottom:9px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .18s}
+.cls-card:hover{border-color:rgba(240,192,64,.5);transform:translateY(-2px);box-shadow:0 6px 28px rgba(240,192,64,.12)}
+.cls-card:active{transform:scale(.97)}
+.cls-ico{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--ora));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.cls-name{font-family:var(--ff);font-size:22px;letter-spacing:2px;color:var(--gold);line-height:1}
+.cls-meta{font-size:10px;color:var(--t2);margin-top:2px}
+.cls-arr{font-size:20px;color:var(--t3);margin-left:auto}
+/* active class banner */
+.cls-banner{display:flex;align-items:center;gap:8px;padding:6px 12px;background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.25);border-radius:20px;font-size:11px;font-weight:600;color:var(--gold);cursor:pointer;flex-shrink:0}
+/* dominant pill highlight */
+.act-pill.dominant{border-width:2px;transform:scale(1.06)}
+.act-pill.dominant .act-p{font-size:12px;font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-ico">🏀</div>
+  <div class="sp-title">PowerMatch</div>
+  <div class="sp-sub">EPS · Basketball · Manager</div>
+  <div class="sp-bar"><div class="sp-prog"></div></div>
+</div>
+
+<div class="toaster" id="toaster"></div>
+
+<div id="app">
+
+<!-- ═══ HOME ═══ -->
+<div id="homeScreen">
+  <div class="h-logo">🏀</div>
+  <div class="h-title">PowerMatch</div>
+  <div class="h-sub">EPS · Basketball</div>
+  <div id="homeCls" class="cls-banner" onclick="goClassPick()" style="margin-bottom:18px">🏫 <span id="homeClsName">Aucune classe — appuyez pour choisir</span></div>
+  <div class="mode-grid">
+    <div class="mc mc-match" onclick="goScreen('matchScreen')">
+      <div class="mc-inner"><div class="mc-ico">⚔️</div><div class="mc-txt"><div class="mc-name">Match</div><div class="mc-desc">Score parlant · Pouvoirs · Minuteur</div></div><div class="mc-arr">▶</div></div>
+    </div>
+    <div class="mc mc-rank" onclick="goScreen('classementScreen')">
+      <div class="mc-inner"><div class="mc-ico">🏆</div><div class="mc-txt"><div class="mc-name">Classement</div><div class="mc-desc">Score général et historique</div></div><div class="mc-arr">▶</div></div>
+    </div>
+    <div class="mc mc-stats" onclick="goScreen('statsScreen')">
+      <div class="mc-inner"><div class="mc-ico">📊</div><div class="mc-txt"><div class="mc-name">Statistiques</div><div class="mc-desc">Actions marquées par élève</div></div><div class="mc-arr">▶</div></div>
+    </div>
+    <div class="mc mc-reg" onclick="goScreen('reglagesScreen')">
+      <div class="mc-inner"><div class="mc-ico">⚙️</div><div class="mc-txt"><div class="mc-name">Réglages</div><div class="mc-desc">Équipes · Pouvoirs · Règles · Réseau</div></div><div class="mc-arr">▶</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MATCH ═══ -->
+<div class="screen" id="matchScreen">
+  <div class="scr-hdr">
+    <div class="back-btn" onclick="goHome()">←</div>
+    <div><div class="hdr-title" style="color:var(--blu)">⚔️ Match</div><div class="hdr-sub">Gestion terrain</div></div>
+    <div class="hdr-right"><div class="cdot err" id="cdot"></div><span id="clabel" style="font-size:10px;color:var(--t2)">Hors ligne</span></div>
+  </div>
+  <!-- setup -->
+  <div id="mSetup" class="bp">
+    <div class="card">
+      <div class="ctitle">⚔️ Équipes</div>
+      <div class="g2">
+        <div class="ig"><label class="il">Équipe A</label><select class="inp" id="selA" onchange="onTeamSel()"><option value="">-- Choisir --</option></select></div>
+        <div class="ig"><label class="il">Équipe B</label><select class="inp" id="selB" onchange="onTeamSel()"><option value="">-- Choisir --</option></select></div>
+      </div>
+      <div id="prevPl" style="display:none"><div class="g2"><div id="prevA" class="pchips"></div><div id="prevB" class="pchips"></div></div></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">👤 Rôles</div>
+      <div class="g2">
+        <div class="ig"><label class="il">Arbitre (équipe)</label><select class="inp" id="selArb"><option value="">-- Aucun --</option></select></div>
+        <div class="ig"><label class="il">Observateur</label><select class="inp" id="selObs"><option value="">-- Aucun --</option></select></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle">⏱ Durées</div>
+      <div class="g2">
+        <div class="ig"><label class="il">Mi-temps (min)</label><input class="inp" type="number" id="perdMin" value="3" min="1" max="30"></div>
+        <div class="ig"><label class="il">Temps mort (sec)</label><input class="inp" type="number" id="toutSec" value="60" min="10" max="300"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle">⭐ Options</div>
+      <div class="chk-row" onclick="toggleChk('chkBonus')">
+        <input type="checkbox" id="chkBonus">
+        <label for="chkBonus">Activer le BONUS 1000pts pour ce match</label>
+        <span>⭐</span>
+      </div>
+    </div>
+    <div id="startPwPrev" style="display:none">
+      <div class="card" style="border-color:rgba(180,79,255,.35)">
+        <div class="ctitle" style="color:var(--pur)">⚡ Pouvoir de départ</div>
+        <div id="startPwInfo"></div>
+      </div>
+    </div>
+    <button class="btn btn-gld btn-block" onclick="startMatch()" id="btnStart" disabled>🏀 LANCER LE MATCH</button>
+  </div>
+  <!-- active -->
+  <div id="mActive" style="display:none">
+    <div class="arena">
+      <div class="teams-bar">
+        <div class="tcol">
+          <div class="tc-name sc-a" id="mNameA">A</div>
+          <div class="tc-score sc-a" id="mScoreA">0</div>
+          <div class="tc-break" id="mBreakA">0×1·0×10·0×100</div>
+          <div class="pw-slot" id="pwSlotA"></div>
+        </div>
+        <div class="vscol">
+          <div class="vs-txt">VS</div>
+          <div class="pd-badge" id="pdBadge">MT 1</div>
+        </div>
+        <div class="tcol">
+          <div class="tc-name sc-b" id="mNameB">B</div>
+          <div class="tc-score sc-b" id="mScoreB">0</div>
+          <div class="tc-break" id="mBreakB">0×1·0×10·0×100</div>
+          <div class="pw-slot" id="pwSlotB"></div>
+        </div>
+      </div>
+      <div id="mRolesBar" style="text-align:center;font-size:10px;color:var(--t3);margin-bottom:6px"></div>
+    </div>
+    <div class="timer-blk"><div class="timer-big" id="timerDisp">3:00</div></div>
+    <div class="timer-btns">
+      <button class="tbtn tbtn-play" id="btnPlay" onclick="timerPlay()">▶</button>
+      <button class="tbtn tbtn-stop" id="btnStop" onclick="timerStop()" disabled>⏸</button>
+      <button class="tbtn tbtn-reset" onclick="timerReset()">↺</button>
+      <button class="tbtn-wide tbtn-tout" onclick="callTimeout()">⏱ T.MORT</button>
+      <button class="tbtn-wide tbtn-end" onclick="endMatch()">🏁 FIN</button>
+    </div>
+    <div class="draw-bar">
+      <button class="btn btn-gst btn-block btn-sm" onclick="triggerPowerDraw('manual')">🎴 Tirer un pouvoir</button>
+    </div>
+    <div class="bonus-row" id="bonusRow" style="display:none">
+      <button class="bonus-btn A" onclick="grantBonus('A')">
+        <span class="tc-name sc-a" id="bonusNameA" style="font-size:12px;font-family:var(--ff)">A</span>
+        <span class="bonus-bval">+1000</span>
+        <span style="font-size:9px;opacity:.7">BONUS ⭐</span>
+      </button>
+      <button class="bonus-btn B" onclick="grantBonus('B')">
+        <span class="tc-name sc-b" id="bonusNameB" style="font-size:12px;font-family:var(--ff)">B</span>
+        <span class="bonus-bval">+1000</span>
+        <span style="font-size:9px;opacity:.7">BONUS ⭐</span>
+      </button>
+    </div>
+    <div class="sc-panels">
+      <div class="sp A"><div class="sp-lbl" id="spLblA">A</div><div id="slA"></div><div class="m-row"><input class="m-inp" type="number" id="minpA" placeholder="Total"><button class="m-set" onclick="setManual('A')">SET</button></div></div>
+      <div class="sp B"><div class="sp-lbl" id="spLblB">B</div><div id="slB"></div><div class="m-row"><input class="m-inp" type="number" id="minpB" placeholder="Total"><button class="m-set" onclick="setManual('B')">SET</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CLASSEMENT ═══ -->
+<div class="screen" id="classementScreen">
+  <div class="scr-hdr"><div class="back-btn" onclick="goHome()">←</div><div><div class="hdr-title" style="color:var(--gold)">🏆 Classement</div><div class="hdr-sub">Score parlant cumulé</div></div></div>
+  <div class="bp">
+    <div class="itabs"><button class="itab on" onclick="showRkTab('gen',this)">Général</button><button class="itab" onclick="showRkTab('hist',this)">Historique</button></div>
+    <div id="rkGen"></div><div id="rkHist" style="display:none"></div>
+    <button class="btn btn-gst btn-sm" style="margin-top:10px" onclick="resetRanking()">🔄 Réinitialiser</button>
+  </div>
+</div>
+
+<!-- ═══ STATS ═══ -->
+<div class="screen" id="statsScreen">
+  <div class="scr-hdr"><div class="back-btn" onclick="goHome()">←</div><div><div class="hdr-title" style="color:var(--grn)">📊 Statistiques</div><div class="hdr-sub">Actions par élève</div></div></div>
+  <div class="bp">
+    <div class="itabs"><button class="itab on" onclick="showStTab('pl',this)">Joueurs</button><button class="itab" onclick="showStTab('tm',this)">Par équipe</button></div>
+    <div class="sb-grid" id="stBoxes"></div>
+    <div id="stPl"></div><div id="stTm" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ═══ RÉGLAGES ═══ -->
+<div class="screen" id="reglagesScreen">
+  <div class="scr-hdr"><div class="back-btn" onclick="goHome()">←</div><div><div class="hdr-title" style="color:var(--pur)">⚙️ Réglages</div><div class="hdr-sub">Configuration</div></div></div>
+  <div class="bp">
+    <div class="itabs">
+      <button class="itab on" onclick="showRegTab('teams',this)">Équipes</button>
+      <button class="itab" onclick="showRegTab('powers',this)">Pouvoirs</button>
+      <button class="itab" onclick="showRegTab('rules',this)">Règles</button>
+      <button class="itab" onclick="showRegTab('net',this)">Réseau</button>
+    </div>
+    <!-- TEAMS -->
+    <div id="regTeams">
+      <div class="card">
+        <div class="ctitle">➕ Créer une équipe</div>
+        <div class="ig"><label class="il">Nom</label><input class="inp" id="ntName" placeholder="Ex: Les Faucons"></div>
+        <div class="ig"><label class="il">Couleur</label><div class="crow" id="cPicker">
+          <div class="csw on" data-c="#00d4ff" style="background:#00d4ff" onclick="pickColor(this)"></div>
+          <div class="csw" data-c="#ff6b2b" style="background:#ff6b2b" onclick="pickColor(this)"></div>
+          <div class="csw" data-c="#00ff88" style="background:#00ff88" onclick="pickColor(this)"></div>
+          <div class="csw" data-c="#f0c040" style="background:#f0c040" onclick="pickColor(this)"></div>
+          <div class="csw" data-c="#b44fff" style="background:#b44fff" onclick="pickColor(this)"></div>
+          <div class="csw" data-c="#ff3366" style="background:#ff3366" onclick="pickColor(this)"></div>
+          <div class="csw" data-c="#ffffff" style="background:#fff" onclick="pickColor(this)"></div>
+        </div></div>
+        <div class="ig"><label class="il">Joueurs (Entrée pour ajouter)</label>
+          <input class="inp" id="ntPlayer" placeholder="Prénom" onkeydown="if(event.key==='Enter')addNtPlayer()">
+          <div class="pchips" id="ntChips" style="margin-top:7px"></div>
+        </div>
+        <button class="btn btn-blu btn-block" onclick="createTeam()">✅ Créer l'équipe</button>
+      </div>
+      <div id="teamsList"></div>
+    </div>
+    <!-- POWERS -->
+    <div id="regPowers" style="display:none">
+      <div class="card">
+        <div class="ctitle">🎴 Éditeur de pouvoirs</div>
+        <div style="display:flex;gap:7px;margin-bottom:9px">
+          <button class="btn btn-sm on" id="ptPos" onclick="setPType('positive',this)" style="flex:1;background:rgba(0,255,136,.14);color:var(--grn);border:1px solid rgba(0,255,136,.28)">✅ Positif</button>
+          <button class="btn btn-sm" id="ptNeg" onclick="setPType('negative',this)" style="flex:1;background:rgba(255,255,255,.06);color:var(--t2);border:1px solid var(--brd)">❌ Négatif</button>
+        </div>
+        <div style="display:flex;gap:5px;margin-bottom:10px">
+          <button class="itab on" onclick="setPLevel(1,this)" id="plv1">Niv.1 ⭐</button>
+          <button class="itab" onclick="setPLevel(2,this)" id="plv2">Niv.2 ⭐⭐</button>
+          <button class="itab" onclick="setPLevel(3,this)" id="plv3">Niv.3 ⭐⭐⭐</button>
+        </div>
+        <div id="pwList"></div>
+        <hr class="d">
+        <div class="ig"><label class="il">Nom</label><input class="inp" id="npName" placeholder="Ex: Interdiction de dribbler"></div>
+        <div class="ig"><label class="il">Description</label><input class="inp" id="npDesc" placeholder="Ex: Le porteur ne peut pas dribbler"></div>
+        <div class="ig">
+          <label class="il">Visuel du pouvoir</label>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <button class="imt-tab on" id="imt-emoji" onclick="setIconMode('emoji',this)">😀 Emoji</button>
+            <button class="imt-tab" id="imt-photo" onclick="setIconMode('photo',this)">📷 Photo</button>
+          </div>
+          <div id="iconModeEmoji">
+            <div style="display:flex;gap:8px;align-items:center">
+              <div id="npIconPrev" style="width:50px;height:50px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;overflow:hidden">⚡</div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:5px">
+                <input class="inp" id="npIcon" placeholder="Tapez un emoji…" maxlength="4" oninput="previewIcon(this.value)">
+                <button class="btn btn-gst btn-sm" onclick="openIconGallery()" style="justify-content:center">📚 Galerie</button>
+              </div>
+            </div>
+          </div>
+          <div id="iconModePhoto" style="display:none">
+            <div style="display:flex;gap:9px;align-items:flex-start">
+              <div id="npPhotoPrev" onclick="document.getElementById('npPhotoInput').click()" style="width:78px;height:78px;border-radius:12px;background:rgba(255,255,255,.05);border:2px dashed var(--brd);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;cursor:pointer">
+                <span style="font-size:22px">📷</span>
+                <span style="font-size:9px;color:var(--t3);margin-top:3px;text-align:center">CHOISIR</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:7px">
+                <input type="file" id="npPhotoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
+                <button class="btn btn-gld btn-sm" onclick="document.getElementById('npPhotoInput').click()" style="justify-content:center">📂 Choisir une image</button>
+                <div style="font-size:10px;color:var(--t3);line-height:1.5">JPG · PNG · GIF<br>Stockée hors ligne</div>
+                <button class="btn btn-gst btn-sm" id="npPhotoClear" onclick="clearPhoto()" style="display:none;justify-content:center;color:var(--red)">🗑 Supprimer</button>
+              </div>
+            </div>
+            <div id="npPhotoInfo" style="display:none;margin-top:7px;padding:5px 9px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:8px;font-size:10px;color:var(--grn)"></div>
+          </div>
+        </div>
+        <div class="ig"><label class="il">Catégorie</label>
+          <select class="inp" id="npCat">
+            <option value="motricite">🏃 Motricité</option>
+            <option value="tactique">🧠 Tactique</option>
+            <option value="temps">⏱ Temps</option>
+            <option value="espace">🗺 Espace</option>
+            <option value="score">💯 Score</option>
+          </select>
+        </div>
+        <button class="btn btn-blu btn-block" onclick="addPower()">➕ Ajouter ce pouvoir</button>
+      </div>
+      <!-- LIBRARY -->
+      <div class="card">
+        <div class="ctitle">📚 Bibliothèque — 50 pouvoirs</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
+          <button class="lib-filter on" data-t="all" onclick="setLibF('type','all',this)">Tous</button>
+          <button class="lib-filter" data-t="pos" onclick="setLibF('type','positive',this)">✅ Positifs</button>
+          <button class="lib-filter" data-t="neg" onclick="setLibF('type','negative',this)">❌ Négatifs</button>
+          <button class="lib-filter" data-lv="1" onclick="setLibF('lv','1',this)">⭐</button>
+          <button class="lib-filter" data-lv="2" onclick="setLibF('lv','2',this)">⭐⭐</button>
+          <button class="lib-filter" data-lv="3" onclick="setLibF('lv','3',this)">⭐⭐⭐</button>
+        </div>
+        <div class="itabs" style="margin-bottom:9px">
+          <button class="itab on" onclick="setLibCat('all',this)">Toutes</button>
+          <button class="itab" onclick="setLibCat('motricite',this)">🏃</button>
+          <button class="itab" onclick="setLibCat('tactique',this)">🧠</button>
+          <button class="itab" onclick="setLibCat('temps',this)">⏱</button>
+          <button class="itab" onclick="setLibCat('espace',this)">🗺</button>
+        </div>
+        <div id="libList"></div>
+      </div>
+      <!-- MY POWERS -->
+      <div class="card" style="border-color:rgba(240,192,64,.28)">
+        <div class="ctitle" style="color:var(--gold)">⭐ Mes pouvoirs sauvegardés</div>
+        <div style="font-size:11px;color:var(--t2);margin-bottom:11px">Tous les pouvoirs que vous avez créés — persistants après fermeture</div>
+        <div id="myPowersList"></div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">
+          <button class="btn btn-gst btn-sm" onclick="exportPowers()">📤 Exporter</button>
+          <button class="btn btn-gst btn-sm" onclick="document.getElementById('impPowFile').click()">📥 Importer</button>
+        </div>
+        <input type="file" id="impPowFile" accept=".json" style="display:none" onchange="importPowers(event)">
+      </div>
+    </div>
+    <!-- RULES -->
+    <div id="regRules" style="display:none">
+      <div class="card">
+        <div class="ctitle">📏 Seuils → Pouvoirs de départ</div>
+        <div class="ig"><label class="il">Écart ≤ X places → pas de pouvoir</label><input class="inp" id="rNoPow" type="number" value="1" min="0"></div>
+        <div class="ig"><label class="il">Écart X+1 à Y → Niv.1</label><input class="inp" id="rLv1" type="number" value="4" min="1"></div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Au-delà → Niveau 2</div>
+        <hr class="d">
+        <div class="ctitle">📊 100pts → Niveaux en match</div>
+        <div class="ig"><label class="il">Multiplicateur pour Niv.3</label><input class="inp" id="rMult" type="number" value="3" min="1" oninput="updMult(this.value)"></div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.8">
+          Niv.3 → gagnant a des 100pts, perdant aucun<br>
+          Niv.2 → gagnant a <b id="multD">3</b>× plus de 100pts<br>
+          Niv.1 → gagnant a des 100pts, &lt;<b id="multD2">3</b>×<br>
+          Niv.0 → aucun 100pts → tirage pour les deux
+        </div>
+        <button class="btn btn-blu btn-block" style="margin-top:12px" onclick="saveRules()">💾 Sauvegarder</button>
+      </div>
+    </div>
+    <!-- NETWORK -->
+    <div id="regNet" style="display:none">
+      <div class="card">
+        <div class="ctitle">📡 Mode tablette</div>
+        <div class="g2" style="margin-bottom:12px">
+          <button class="btn btn-gld" onclick="setNetMode('master')" id="btnMaster">👑 MAÎTRE</button>
+          <button class="btn btn-gst" onclick="setNetMode('client')" id="btnClient">📱 CLIENT</button>
+        </div>
+        <div id="netMaster" style="display:none">
+          <div class="ig"><label class="il">IP de cette tablette</label><input class="inp" id="mIP" placeholder="192.168.x.x"></div>
+          <div class="ig"><label class="il">Port</label><input class="inp" id="mPort" type="number" value="8080"></div>
+          <div id="mIPDisp" style="font-family:var(--ft);font-size:18px;color:var(--blu);text-align:center;padding:12px;background:rgba(0,212,255,.06);border-radius:var(--r);border:1px solid rgba(0,212,255,.18);margin-bottom:8px;letter-spacing:2px">—</div>
+          <button class="btn btn-blu btn-block" onclick="startMaster()">▶ Démarrer</button>
+        </div>
+        <div id="netClient" style="display:none">
+          <div class="ig"><label class="il">IP du maître</label><input class="inp" id="cIP" placeholder="192.168.x.x"></div>
+          <div class="ig"><label class="il">Port</label><input class="inp" id="cPort" type="number" value="8080"></div>
+          <div class="ig"><label class="il">Nom de cette tablette</label><input class="inp" id="tName" placeholder="Terrain 1"></div>
+          <button class="btn btn-blu btn-block" onclick="connectMaster()">🔗 Connecter</button>
+        </div>
+        <div id="netNone" style="text-align:center;color:var(--t3);padding:14px;font-size:12px">Choisissez le mode ci-dessus</div>
+      </div>
+      <div class="card">
+        <div class="ctitle">💾 Données</div>
+        <div class="g2">
+          <button class="btn btn-gst btn-sm" onclick="exportData()">📤 Exporter</button>
+          <button class="btn btn-gst btn-sm" onclick="document.getElementById('impFile').click()">📥 Importer</button>
+        </div>
+        <input type="file" id="impFile" accept=".json" style="display:none" onchange="importData(event)">
+        <button class="btn btn-red btn-sm btn-block" style="margin-top:7px" onclick="clearAll()">🗑️ Effacer tout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ CLASS PICKER ═══ -->
+<div id="classPickScreen">
+  <div class="h-logo" style="width:64px;height:64px;font-size:32px;margin-bottom:8px">🏫</div>
+  <div class="h-title" style="font-size:32px;margin-bottom:3px">Mes Classes</div>
+  <div class="h-sub" style="margin-bottom:20px">Sélectionnez ou créez une classe</div>
+  <div id="clsList" style="width:100%;max-width:440px"></div>
+  <!-- Create new class -->
+  <div style="width:100%;max-width:440px;background:var(--bg3);border:1px dashed var(--brd);border-radius:var(--rl);padding:14px;margin-top:4px">
+    <div style="font-size:10px;letter-spacing:2px;color:var(--t2);text-transform:uppercase;margin-bottom:8px">➕ Nouvelle classe</div>
+    <div style="display:flex;gap:8px">
+      <input class="inp" id="newClsName" placeholder="Ex: 3ème A, Terminale B…" style="flex:1">
+      <button class="btn btn-gld" onclick="createClass()">Créer</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ CONFIRM MODAL ═══ -->
+<div class="ov" id="confirmOv" style="z-index:900">
+  <div class="ov-box" style="text-align:center;max-width:320px">
+    <div id="confirmIcon" style="font-size:38px;margin-bottom:10px">⚠️</div>
+    <div id="confirmMsg" style="font-size:14px;font-weight:600;color:var(--t1);line-height:1.5;margin-bottom:18px"></div>
+    <div class="g2" style="gap:10px">
+      <button class="btn btn-gst" style="justify-content:center" onclick="confirmResolve(false)">Annuler</button>
+      <button class="btn btn-red" id="confirmOkBtn" style="justify-content:center" onclick="confirmResolve(true)">Confirmer</button>
+    </div>
+  </div>
+</div>
+</div><!-- /app -->
+
+<!-- ═══ ICON GALLERY ═══ -->
+<div class="ig-ov" id="iconGallery">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="font-family:var(--ff);font-size:24px;letter-spacing:2px;color:var(--gold)">📚 Galerie d'icônes</div>
+    <button class="btn btn-gst btn-sm" onclick="closeIconGallery()">✕ Fermer</button>
+  </div>
+  <div class="ig-cats" id="igCats"></div>
+  <div class="ig-grid" id="igGrid"></div>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <input class="inp" id="igCustom" placeholder="Taper un emoji manuellement…" maxlength="4" style="flex:1">
+    <button class="btn btn-gld btn-sm" onclick="selectCustomIcon()">✅ Choisir</button>
+  </div>
+</div>
+
+<!-- ═══ HALF-TIME ═══ -->
+<div class="ht-ov" id="htOv">
+  <div class="ht-title">MI-TEMPS</div>
+  <div style="font-size:12px;color:var(--t2);margin:6px 0 2px">Score à la pause</div>
+  <div id="htScore" style="font-family:var(--ft);font-size:24px;font-weight:700;margin-bottom:16px"></div>
+  <div style="padding:10px 16px;background:rgba(180,79,255,.09);border:1px solid rgba(180,79,255,.28);border-radius:12px;margin-bottom:18px;max-width:300px">
+    <div style="font-size:9px;letter-spacing:2.5px;color:var(--pur);margin-bottom:3px">⚡ TIRAGE</div>
+    <div id="htPowInfo" style="font-size:12px;color:var(--t2)">L'équipe perdante peut tirer un pouvoir</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:270px">
+    <button class="btn btn-gld btn-block" onclick="htPowerDraw()">🎴 TIRER UN POUVOIR</button>
+    <button class="btn btn-gst btn-block" onclick="startP2()">▶ 2ÈME MI-TEMPS</button>
+  </div>
+</div>
+
+<!-- ═══ ENDGAME ═══ -->
+<div class="eg-ov" id="egOv">
+  <div class="eg-trophy">🏆</div>
+  <div style="font-size:11px;letter-spacing:3.5px;color:var(--t2);text-transform:uppercase">Victoire</div>
+  <div style="font-family:var(--ff);font-size:40px;letter-spacing:3px;color:var(--gold);margin:8px 0" id="egWinner">ÉQUIPE</div>
+  <div id="egScore" style="font-family:var(--ft);font-size:22px;font-weight:700;margin-bottom:11px"></div>
+  <div id="egPowers" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:14px;max-width:300px"></div>
+  <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:270px">
+    <button class="btn btn-gld btn-block" onclick="newMatch()">🏀 NOUVEAU MATCH</button>
+    <button class="btn btn-gst btn-block" onclick="egClose();goHome()">🏠 ACCUEIL</button>
+  </div>
+</div>
+
+<!-- ═══ POWER CHOOSE ═══ -->
+<div class="ov" id="pwChoiceOv">
+  <div class="ov-box" style="text-align:center">
+    <div style="font-family:var(--ff);font-size:30px;letter-spacing:2px;color:var(--gold)">⚡ POUVOIR</div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:7px" id="pwcSub">Niveau X</div>
+    <div style="padding:8px 12px;background:rgba(240,192,64,.06);border:1px solid rgba(240,192,64,.18);border-radius:10px;font-size:12px;color:var(--t2);margin-bottom:14px;text-align:left;line-height:1.4" id="pwcCtx"></div>
+    <div class="pw-choose-btns">
+      <button class="pwc-btn pos" onclick="drawPower('positive')"><span style="font-size:26px;display:block;margin-bottom:4px">✅</span><div style="font-size:10px;font-weight:700;letter-spacing:1.5px">POSITIF</div><div style="font-size:10px;color:var(--t2);margin-top:2px">Bonus pour mon équipe</div></button>
+      <button class="pwc-btn neg" onclick="drawPower('negative')"><span style="font-size:26px;display:block;margin-bottom:4px">❌</span><div style="font-size:10px;font-weight:700;letter-spacing:1.5px">NÉGATIF</div><div style="font-size:10px;color:var(--t2);margin-top:2px">Malus sur l'adversaire</div></button>
+    </div>
+    <button class="btn btn-gst btn-block btn-sm" style="margin-top:8px" onclick="closePwChoice()">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══ POWER REVEAL ═══ -->
+<div class="ov" id="pwRevealOv">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:14px;width:100%">
+    <div id="pwCardWrap" class="card-reveal-wrap"></div>
+    <button class="btn btn-gld" style="width:260px;justify-content:center" onclick="acceptPower()">✅ ACTIVER CE POUVOIR</button>
+    <button class="btn btn-gst btn-sm" onclick="rerollPower()" id="rerollBtn">🔄 Repiocher (1×)</button>
+  </div>
+</div>
+
+<!-- ═══ BONUS CONFIRM ═══ -->
+<div class="bc-ov" id="bcOv">
+  <div style="background:var(--bg2);border:2px solid var(--gold);border-radius:var(--rl);padding:22px;max-width:320px;text-align:center;box-shadow:0 0 50px rgba(240,192,64,.22)">
+    <div style="font-size:44px;margin-bottom:7px">⭐</div>
+    <div style="font-family:var(--ff);font-size:30px;letter-spacing:2px;color:var(--gold);margin-bottom:5px">BONUS 1000 pts</div>
+    <div id="bcTeam" style="font-size:16px;font-weight:700;margin-bottom:16px"></div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:18px">Confirmer l'attribution du bonus ?</div>
+    <div class="g2">
+      <button class="btn btn-gst" onclick="closeBc()">Annuler</button>
+      <button class="btn btn-gld" onclick="confirmBonus()">✅ Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════
+// ICON / SVG DATA
+// ═══════════════════════════════════════════════════════════════
+var SVG_ICONS = {
+  svg_fwd:  {label:'Avant seul',     svg:'<svg class="svg-icon" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" fill="#0d1526" stroke="#00d4ff" stroke-width="1.5"/><path d="M14 20V8M14 8L9 13M14 8l5 5" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
+  svg_nodrb:{label:'No dribble',     svg:'<svg class="svg-icon" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" fill="#0d1526" stroke="#ff3366" stroke-width="1.5"/><circle cx="14" cy="16" r="5" stroke="#ff3366" stroke-width="1.8"/><line x1="5" y1="5" x2="23" y2="23" stroke="#ff3366" stroke-width="2" stroke-linecap="round"/></svg>'},
+  svg_zone: {label:'Zone seule',     svg:'<svg class="svg-icon" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" fill="#0d1526" stroke="#f0c040" stroke-width="1.5"/><rect x="8" y="10" width="12" height="10" rx="2" stroke="#f0c040" stroke-width="1.8" stroke-dasharray="2 1.5"/><circle cx="14" cy="15" r="2.5" fill="#f0c040"/></svg>'},
+  svg_hand: {label:'Main faible',    svg:'<svg class="svg-icon" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" fill="#0d1526" stroke="#b44fff" stroke-width="1.5"/><text x="14" y="19" font-size="13" text-anchor="middle" fill="#b44fff">&#x1F91A;</text><text x="20" y="11" font-size="8" fill="#ff3366">&#x2715;</text></svg>'},
+  svg_pass: {label:'Passes obligat.',svg:'<svg class="svg-icon" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" fill="#0d1526" stroke="#00ff88" stroke-width="1.5"/><circle cx="8" cy="14" r="2.5" fill="#00ff88"/><circle cx="20" cy="14" r="2.5" fill="#00ff88"/><path d="M10.5 14h7" stroke="#00ff88" stroke-width="1.8" stroke-linecap="round"/><path d="M16 11.5l3.5 2.5-3.5 2.5" stroke="#00ff88" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><text x="14" y="23" font-size="7" text-anchor="middle" fill="#00ff88">3x</text></svg>'},
+  svg_run:  {label:'Courir avec',    svg:'<svg class="svg-icon" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" fill="#0d1526" stroke="#ff6b2b" stroke-width="1.5"/><path d="M10 20l4-8 4 8M10 14h8" stroke="#ff6b2b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="8" r="2" fill="#ff6b2b"/></svg>'}
+};
+var ICON_CATS = {
+  'Ballon & Passes':    ['🏀','⛹️','🤲','🙌','✋','👐','🤜','👋','🤚','🤾','🥅','🎯','🏹','🤛'],
+  'Déplacements':       ['🏃','🚶','↗️','⬆️','➡️','↩️','🔄','🔃','↔️','⬇️','🔀','🏃‍♂️','🦘','🚷'],
+  'Corps & Membres':    ['🦵','🦶','👁️','💪','🦾','👈','👉','👆','👇','🤏','🖐️','🤲','🧠','🤛'],
+  'Interdictions':      ['🚫','⛔','❌','🔇','🛑','⚠️','🔕','🚳','🚯','🙅','🙅‍♂️','❓','🔒','📵'],
+  'Temps & Zones':      ['⏱️','⏰','🕐','🏟️','🗺️','📍','🎯','🔵','🟡','🔴','🟢','🏁','⏳','🕰️'],
+  'Effets & Bonus':     ['⚡','🔥','💥','⭐','💫','🌀','💣','🛡️','👑','🚀','🌟','✨','💎','🎴'],
+  'SVG custom':         ['svg_fwd','svg_nodrb','svg_zone','svg_hand','svg_pass','svg_run']
+};
+
+// ═══════════════════════════════════════════════════════════════
+// POWER LIBRARY (fixed, not saved)
+// ═══════════════════════════════════════════════════════════════
+var POWER_LIB = [
+  // motricite negative
+  {id:'m01',cat:'motricite',type:'negative',level:1,icon:'svg_nodrb',name:'Interdiction de dribbler',      desc:'Le porteur ne peut pas dribbler — transmission directe uniquement'},
+  {id:'m02',cat:'motricite',type:'negative',level:1,icon:'svg_fwd',  name:'Déplacement avant uniquement', desc:'Les joueurs ne peuvent se déplacer que vers l\'avant'},
+  {id:'m03',cat:'motricite',type:'negative',level:1,icon:'svg_hand', name:'Main faible obligatoire',       desc:'Le porteur doit utiliser uniquement sa main non dominante'},
+  {id:'m04',cat:'motricite',type:'negative',level:1,icon:'svg_pass', name:'3 passes avant de tirer',       desc:'3 passes consécutives obligatoires avant tout tir'},
+  {id:'m05',cat:'motricite',type:'negative',level:1,icon:'🦵',       name:'Jouer accroupi',                desc:'Les joueurs doivent rester accroupis pour se déplacer'},
+  {id:'m06',cat:'motricite',type:'negative',level:1,icon:'🚶',       name:'Marche seulement',              desc:'Le porteur doit avancer lentement, pas de course'},
+  {id:'m07',cat:'motricite',type:'negative',level:2,icon:'⏱️',       name:'Possession 3 secondes',         desc:'Maximum 3 secondes de possession par joueur'},
+  {id:'m08',cat:'motricite',type:'negative',level:2,icon:'🦶',       name:'Cloche-pied',                   desc:'Le porteur doit se déplacer à cloche-pied'},
+  {id:'m09',cat:'motricite',type:'negative',level:2,icon:'svg_zone', name:'Tir zone unique',               desc:'Tirs uniquement depuis une zone définie — valent double'},
+  {id:'m10',cat:'motricite',type:'negative',level:2,icon:'🔄',       name:'Rotation de porteur',           desc:'Doit passer à un autre joueur après chaque dribble'},
+  {id:'m11',cat:'motricite',type:'negative',level:2,icon:'🚫',       name:'Pas de tir en suspension',      desc:'Tirs effectués uniquement les deux pieds au sol'},
+  {id:'m12',cat:'motricite',type:'negative',level:3,icon:'👁️',       name:'Yeux fermés',                   desc:'Le porteur doit fermer les yeux lors de chaque dribble'},
+  {id:'m13',cat:'motricite',type:'negative',level:3,icon:'🏀',       name:'5 passes obligatoires',         desc:'5 passes consécutives avant tout tir, sinon annulation'},
+  {id:'m14',cat:'motricite',type:'negative',level:3,icon:'🦵',       name:'Tir à genou',                   desc:'Tout tir doit être effectué à genoux'},
+  // motricite positive
+  {id:'m15',cat:'motricite',type:'positive',level:1,icon:'svg_run',  name:'Courir avec le ballon',         desc:'Le porteur peut courir librement sans dribbler'},
+  {id:'m16',cat:'motricite',type:'positive',level:1,icon:'🏃',       name:'Temps de pas autorisé',         desc:'Le porteur peut marcher avec le ballon sans pénalité'},
+  {id:'m17',cat:'motricite',type:'positive',level:2,icon:'🤝',       name:'Contact récupération',          desc:'Toucher l\'adversaire pour lui prendre le ballon est autorisé'},
+  {id:'m18',cat:'motricite',type:'positive',level:2,icon:'🔀',       name:'Double porteur',                desc:'Deux joueurs peuvent tenir le ballon simultanément'},
+  {id:'m19',cat:'motricite',type:'positive',level:2,icon:'↩️',       name:'Pivot illimité',                desc:'Pas de faute de marcher lors des pivots'},
+  {id:'m20',cat:'motricite',type:'positive',level:3,icon:'⚡',       name:'Ultra sprint',                  desc:'Courir, dribbler et passer sans aucune restriction'},
+  {id:'m21',cat:'motricite',type:'positive',level:3,icon:'🏆',       name:'Règles inversées',              desc:'L\'adversaire applique vos restrictions pendant 1 min'},
+  // tactique negative
+  {id:'t01',cat:'tactique', type:'negative',level:1,icon:'🙅',       name:'Silence total',                 desc:'L\'équipe ne peut pas communiquer verbalement'},
+  {id:'t02',cat:'tactique', type:'negative',level:1,icon:'🔇',       name:'Pas de consignes',              desc:'Le leader ne peut pas donner d\'instructions'},
+  {id:'t03',cat:'tactique', type:'negative',level:2,icon:'🔀',       name:'Rôles inversés',                desc:'Attaquants et défenseurs échangent leurs rôles'},
+  {id:'t04',cat:'tactique', type:'negative',level:2,icon:'💀',       name:'Joueur suspendu',               desc:'Un joueur désigné ne participe pas pendant 2 min'},
+  {id:'t05',cat:'tactique', type:'negative',level:2,icon:'🎲',       name:'Tirage aléatoire',              desc:'L\'adversaire choisit le prochain porteur obligatoire'},
+  {id:'t06',cat:'tactique', type:'negative',level:3,icon:'🌀',       name:'Chaos total',                   desc:'Toutes les décisions par tirage au sort pendant 1 min'},
+  {id:'t07',cat:'tactique', type:'negative',level:3,icon:'🔁',       name:'Équipe réduite',                desc:'Deux joueurs s\'assoient — infériorité numérique'},
+  // tactique positive
+  {id:'t08',cat:'tactique', type:'positive',level:1,icon:'🎯',       name:'Rebond garanti',                desc:'Tout rebond offensif donne automatiquement la possession'},
+  {id:'t09',cat:'tactique', type:'positive',level:1,icon:'🛡️',       name:'Bouclier défensif',             desc:'+10 pts bonus sur la prochaine action défensive réussie'},
+  {id:'t10',cat:'tactique', type:'positive',level:2,icon:'🔥',       name:'Momentum',                     desc:'Prochain panier marqué compte double'},
+  {id:'t11',cat:'tactique', type:'positive',level:2,icon:'🎴',       name:'Rejouer le tirage',             desc:'Annule le dernier pouvoir adverse et repiochez'},
+  {id:'t12',cat:'tactique', type:'positive',level:3,icon:'👑',       name:'Invincibilité',                 desc:'Annule tous les malus actifs + immunité 1 min'},
+  {id:'t13',cat:'tactique', type:'positive',level:3,icon:'🚀',       name:'Super stratégie',               desc:'Choisissez librement la prochaine règle pour l\'adversaire'},
+  // temps negative
+  {id:'p01',cat:'temps',    type:'negative',level:1,icon:'⏱️',       name:'Possession 5 secondes',         desc:'Maximum 5 secondes par joueur avant passe obligatoire'},
+  {id:'p02',cat:'temps',    type:'negative',level:1,icon:'⏰',       name:'Dribble 3 secondes',            desc:'Maximum 3 secondes de dribble consécutif'},
+  {id:'p03',cat:'temps',    type:'negative',level:2,icon:'🕐',       name:'Attaque chrono',                desc:'Tirer dans les 10 secondes après récupération'},
+  {id:'p04',cat:'temps',    type:'negative',level:2,icon:'⌛',       name:'Ralentissement',                desc:'Tous les déplacements doivent être effectués lentement'},
+  {id:'p05',cat:'temps',    type:'negative',level:3,icon:'🔕',       name:'Pause forcée',                  desc:'Pause de 30s — l\'adversaire joue seul'},
+  // temps positive
+  {id:'p06',cat:'temps',    type:'positive',level:1,icon:'⚡',       name:'Actions rapides',               desc:'2 actions offensives consécutives autorisées'},
+  {id:'p07',cat:'temps',    type:'positive',level:2,icon:'⏱️',       name:'Temps mort bonus',              desc:'Temps mort supplémentaire de 30 secondes'},
+  {id:'p08',cat:'temps',    type:'positive',level:2,icon:'🔋',       name:'Possession prolongée',          desc:'Le temps de possession maximum est doublé'},
+  {id:'p09',cat:'temps',    type:'positive',level:3,icon:'⏮️',       name:'Rembobinage',                   desc:'Annule les 2 dernières minutes de jeu'},
+  // espace negative
+  {id:'e01',cat:'espace',   type:'negative',level:1,icon:'svg_zone', name:'Zone de tir restreinte',        desc:'Tirs autorisés uniquement depuis une zone du terrain'},
+  {id:'e02',cat:'espace',   type:'negative',level:1,icon:'🔵',       name:'Couloir unique',                desc:'L\'équipe ne peut se déplacer que dans un couloir central'},
+  {id:'e03',cat:'espace',   type:'negative',level:2,icon:'🚷',       name:'Raquette interdite',            desc:'Aucun joueur ne peut entrer dans la raquette adverse'},
+  {id:'e04',cat:'espace',   type:'negative',level:2,icon:'🗺️',       name:'Demi-terrain',                  desc:'L\'équipe joue uniquement dans sa moitié de terrain'},
+  {id:'e05',cat:'espace',   type:'negative',level:3,icon:'📍',       name:'Tir point unique',              desc:'Un seul point de tir autorisé, marqué par l\'arbitre'},
+  {id:'e06',cat:'espace',   type:'negative',level:3,icon:'🔴',       name:'Zone maudite',                  desc:'Une zone est interdite — tout contact = perte de balle'},
+  // espace positive
+  {id:'e07',cat:'espace',   type:'positive',level:1,icon:'🟢',       name:'Zone bonus',                    desc:'Une zone désignée vaut double si le tir part de là'},
+  {id:'e08',cat:'espace',   type:'positive',level:2,icon:'🏟️',       name:'Terrain illimité',              desc:'L\'équipe peut utiliser tout le terrain sans restriction'},
+  {id:'e09',cat:'espace',   type:'positive',level:2,icon:'🎯',       name:'Cible dorée',                   desc:'Tout panier depuis le fond du terrain vaut 300pts'},
+  {id:'e10',cat:'espace',   type:'positive',level:3,icon:'🌟',       name:'Partout c\'est bon',            desc:'L\'équipe peut tirer de n\'importe quelle position'}
+];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+// Classes system: each class has its own teams/ranking/history/playerStats
+// S holds the ACTIVE class data; allClasses[] holds all classes in storage
+var S = {
+  teams:[], ranking:{}, history:[], playerStats:{},
+  powers:{positive:{1:[],2:[],3:[]},negative:{1:[],2:[],3:[]}},
+  rules:{noPow:1,lv1Max:4,mult:3},
+  match:null, ws:null, wsMode:null
+};
+var currentClassId = null; // null = no class selected
+var allClasses = [];        // [{id, name, createdAt}]
+var timer = {iv:null,left:180,running:false,period:1,inTout:false,toutDur:60,perDur:180};
+var pendPow = {level:1,type:null,ctx:'',rerolled:false,card:null};
+var ntPlayers=[], ntColor='#00d4ff', curPType='positive', curPLevel=1;
+var selectedIcon='⚡', igCurrentCat=null, bonusPendingSide=null;
+var selectedPhotoB64=null, iconInputMode='emoji';
+var libFType='all', libFLv='all', libFCat='all';
+
+// ═══════════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('load', function() {
+  loadGlobalStorage();  // loads classes list + powers/rules (global)
+  setTimeout(function() {
+    document.getElementById('splash').classList.add('hide');
+    document.getElementById('app').classList.add('on');
+    // Always start on class picker
+    showClassPicker();
+  }, 2200);
+});
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+
+function renderAll() {
+  renderTeamSelects();
+  renderTeamsList();
+  renderPowerList();
+  renderRanking();
+  renderStats();
+  renderLibrary();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════════════════════
+function uid() { return Math.random().toString(36).slice(2,9); }
+
+// ── GLOBAL storage (classes list + powers + rules — shared across classes) ──
+function saveGlobal() {
+  localStorage.setItem('pm4_global', JSON.stringify({
+    classes: allClasses,
+    powers:  S.powers,
+    rules:   S.rules
+  }));
+}
+function loadGlobalStorage() {
+  var raw = localStorage.getItem('pm4_global');
+  if (raw) {
+    try {
+      var d = JSON.parse(raw);
+      if (d.classes) allClasses = d.classes;
+      if (d.powers)  S.powers = d.powers;
+      if (d.rules)   S.rules = d.rules;
+      document.getElementById('rNoPow').value = S.rules.noPow;
+      document.getElementById('rLv1').value   = S.rules.lv1Max;
+      document.getElementById('rMult').value  = S.rules.mult;
+      updMult(S.rules.mult);
+    } catch(e) {}
+  }
+  initDefaultPowers();
+}
+
+// ── CLASS storage (teams/ranking/history/playerStats per class) ──
+function saveClass() {
+  if (!currentClassId) return;
+  localStorage.setItem('pm4_cls_' + currentClassId, JSON.stringify({
+    teams: S.teams, ranking: S.ranking,
+    history: S.history, playerStats: S.playerStats
+  }));
+}
+function loadClass(classId) {
+  var raw = localStorage.getItem('pm4_cls_' + classId);
+  S.teams=[]; S.ranking={}; S.history=[]; S.playerStats={};
+  if (raw) {
+    try {
+      var d = JSON.parse(raw);
+      if (d.teams)       S.teams       = d.teams;
+      if (d.ranking)     S.ranking     = d.ranking;
+      if (Array.isArray(d.history)) S.history = d.history; else S.history = [];
+      if (d.playerStats) S.playerStats = d.playerStats;
+    } catch(e) {}
+  }
+}
+
+// save = save both class data and global (powers/rules may change)
+function save() {
+  saveClass();
+  saveGlobal();
+}
+
+function initDefaultPowers() {
+  var has = false;
+  ['positive','negative'].forEach(function(t) {
+    [1,2,3].forEach(function(l) { if ((S.powers[t][l]||[]).length) has = true; });
+  });
+  if (has) return;
+  S.powers.positive[1] = [{id:uid(),name:'Bouclier',     desc:'+10pts bonus sur la prochaine action',icon:'🛡️',cat:'score'}];
+  S.powers.positive[2] = [{id:uid(),name:'Super Charge', desc:'Les 100pts comptent double pendant 1 min',icon:'🔥',cat:'score'}];
+  S.powers.positive[3] = [{id:uid(),name:'ULTRA BOOST',  desc:'+100pts et annulation du dernier malus',icon:'💥',cat:'score'}];
+  S.powers.negative[1] = [{id:uid(),name:'Dribble interdit',desc:'Le porteur ne peut pas dribbler',icon:'svg_nodrb',cat:'motricite'}];
+  S.powers.negative[2] = [{id:uid(),name:'3 passes oblig.',desc:'3 passes avant tout tir',icon:'svg_pass',cat:'motricite'}];
+  S.powers.negative[3] = [{id:uid(),name:'DESTRUCTION',  desc:'-100pts adverse',icon:'💣',cat:'score'}];
+  saveGlobal();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER HELPERS
+// ═══════════════════════════════════════════════════════════════
+function renderVisual(p, size) {
+  size = size || 22;
+  if (p.photo) {
+    return '<img src="' + p.photo + '" style="width:' + size + 'px;height:' + size + 'px;border-radius:' + Math.round(size*0.22) + 'px;object-fit:cover;flex-shrink:0" alt="">';
+  }
+  var ic = p.icon || '⚡';
+  if (ic.indexOf('svg_') === 0 && SVG_ICONS[ic]) {
+    return '<span style="width:' + size + 'px;height:' + size + 'px;display:inline-flex;flex-shrink:0">' + SVG_ICONS[ic].svg + '</span>';
+  }
+  return '<span style="font-size:' + size + 'px;flex-shrink:0">' + ic + '</span>';
+}
+function stars(n) { var s=''; for(var i=0;i<n;i++) s+='⭐'; return s; }
+
+// ═══════════════════════════════════════════════════════════════
+// ICON GALLERY
+// ═══════════════════════════════════════════════════════════════
+function openIconGallery() {
+  var ov = document.getElementById('iconGallery');
+  ov.classList.add('on');
+  var cats = Object.keys(ICON_CATS);
+  igCurrentCat = cats[0];
+  var html = '';
+  cats.forEach(function(c) {
+    html += '<button class="ig-cat' + (c===igCurrentCat?' on':'') + '" onclick="showIgCat(\''+c+'\',this)">' + c + '</button>';
+  });
+  document.getElementById('igCats').innerHTML = html;
+  renderIgGrid(igCurrentCat);
+}
+function closeIconGallery() { document.getElementById('iconGallery').classList.remove('on'); }
+function showIgCat(cat, el) {
+  igCurrentCat = cat;
+  document.querySelectorAll('.ig-cat').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  renderIgGrid(cat);
+}
+function renderIgGrid(cat) {
+  var icons = ICON_CATS[cat] || [];
+  var html = '';
+  icons.forEach(function(ic) {
+    var isSvg = ic.indexOf('svg_') === 0;
+    var content = isSvg && SVG_ICONS[ic] ? SVG_ICONS[ic].svg : ic;
+    var label   = isSvg && SVG_ICONS[ic] ? SVG_ICONS[ic].label : '';
+    var selCls  = ic === selectedIcon ? ' on' : '';
+    html += '<div class="ig-item' + selCls + '" onclick="selectIcon(\'' + ic + '\',this)" title="' + label + '">' + content + '</div>';
+  });
+  document.getElementById('igGrid').innerHTML = html;
+}
+function selectIcon(ic, el) {
+  selectedIcon = ic;
+  document.querySelectorAll('.ig-item').forEach(function(i){i.classList.remove('on');});
+  el.classList.add('on');
+  var prev = document.getElementById('npIconPrev');
+  var isSvg = ic.indexOf('svg_') === 0;
+  prev.innerHTML = isSvg && SVG_ICONS[ic] ? SVG_ICONS[ic].svg : ic;
+  document.getElementById('npIcon').value = isSvg ? '' : ic;
+  setTimeout(closeIconGallery, 280);
+}
+function selectCustomIcon() {
+  var v = document.getElementById('igCustom').value.trim();
+  if (!v) { toast('Entrez un emoji','err'); return; }
+  selectedIcon = v;
+  document.getElementById('npIconPrev').textContent = v;
+  document.getElementById('npIcon').value = v;
+  closeIconGallery();
+}
+function previewIcon(v) {
+  if (v) { selectedIcon = v; document.getElementById('npIconPrev').textContent = v; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PHOTO UPLOAD
+// ═══════════════════════════════════════════════════════════════
+function setIconMode(mode, el) {
+  iconInputMode = mode;
+  document.querySelectorAll('.imt-tab').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  document.getElementById('iconModeEmoji').style.display = mode === 'emoji' ? 'block' : 'none';
+  document.getElementById('iconModePhoto').style.display = mode === 'photo' ? 'block' : 'none';
+}
+function handlePhotoUpload(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  if (!file.type.match(/^image\//)) { toast('Fichier non reconnu','err'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    compressImage(e.target.result, 200, 200, 0.75, function(b64, kb) {
+      selectedPhotoB64 = b64;
+      document.getElementById('npPhotoPrev').innerHTML = '<img src="' + b64 + '" style="width:100%;height:100%;object-fit:cover;border-radius:10px" alt="">';
+      document.getElementById('npPhotoClear').style.display = 'flex';
+      document.getElementById('npPhotoInfo').style.display = 'block';
+      document.getElementById('npPhotoInfo').textContent = 'Image chargée · ' + kb + ' Ko (compressée)';
+      toast('Image chargée !','ok');
+    });
+  };
+  reader.readAsDataURL(file);
+}
+function compressImage(src, mw, mh, q, cb) {
+  var img = new Image();
+  img.onload = function() {
+    var w = img.width, h = img.height;
+    if (w > mw || h > mh) {
+      var r = Math.min(mw/w, mh/h);
+      w = Math.round(w*r); h = Math.round(h*r);
+    }
+    var cv = document.createElement('canvas');
+    cv.width = w; cv.height = h;
+    cv.getContext('2d').drawImage(img, 0, 0, w, h);
+    var out = cv.toDataURL('image/jpeg', q);
+    cb(out, Math.round(out.length * 0.75 / 1024));
+  };
+  img.src = src;
+}
+function clearPhoto() {
+  selectedPhotoB64 = null;
+  document.getElementById('npPhotoPrev').innerHTML = '<span style="font-size:22px">📷</span><span style="font-size:9px;color:var(--t3);margin-top:3px;text-align:center">CHOISIR</span>';
+  document.getElementById('npPhotoClear').style.display = 'none';
+  document.getElementById('npPhotoInfo').style.display = 'none';
+  document.getElementById('npPhotoInput').value = '';
+  toast('Image supprimée','warn');
+}
+function resetPhotoUI() {
+  selectedPhotoB64 = null;
+  iconInputMode = 'emoji';
+  document.getElementById('iconModeEmoji').style.display = 'block';
+  document.getElementById('iconModePhoto').style.display = 'none';
+  document.getElementById('imt-emoji').classList.add('on');
+  document.getElementById('imt-photo').classList.remove('on');
+  document.getElementById('npPhotoInput').value = '';
+  document.getElementById('npPhotoClear').style.display = 'none';
+  document.getElementById('npPhotoInfo').style.display = 'none';
+  document.getElementById('npPhotoPrev').innerHTML = '<span style="font-size:22px">📷</span><span style="font-size:9px;color:var(--t3);margin-top:3px;text-align:center">CHOISIR</span>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LIBRARY
+// ═══════════════════════════════════════════════════════════════
+function setLibF(key, val, el) {
+  if (key === 'type') {
+    libFType = val;
+    document.querySelectorAll('.lib-filter[data-t]').forEach(function(b){b.classList.remove('on');});
+    el.classList.add('on');
+  }
+  if (key === 'lv') {
+    libFLv = (libFLv === val) ? 'all' : val;
+    document.querySelectorAll('.lib-filter[data-lv]').forEach(function(b){b.classList.toggle('on', b.dataset.lv === libFLv);});
+  }
+  renderLibrary();
+}
+function setLibCat(cat, el) {
+  libFCat = cat;
+  document.querySelectorAll('.itabs .itab').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  renderLibrary();
+}
+function renderLibrary() {
+  var c = document.getElementById('libList'); if (!c) return;
+  var list = POWER_LIB.filter(function(p) {
+    if (libFType !== 'all' && p.type !== libFType) return false;
+    if (libFLv !== 'all' && p.level !== +libFLv) return false;
+    if (libFCat !== 'all' && p.cat !== libFCat) return false;
+    return true;
+  });
+  if (!list.length) {
+    c.innerHTML = '<div style="color:var(--t3);font-size:12px;text-align:center;padding:12px">Aucun pouvoir pour ces filtres</div>';
+  } else {
+    var html = '';
+    list.forEach(function(p) {
+      var isPos = p.type === 'positive';
+      var added = (S.powers[p.type][p.level]||[]).some(function(e){return e.libId===p.id || e.name===p.name;});
+      var col = isPos ? 'var(--grn)' : 'var(--red)';
+      var bdr = isPos ? 'rgba(0,255,136,.18)' : 'rgba(255,51,102,.18)';
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,.02);border:1px solid ' + bdr + ';border-radius:10px;margin-bottom:5px;' + (added?'opacity:.55':'') + '">';
+      html += '<div style="width:34px;height:34px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex-shrink:0">' + renderVisual(p,24) + '</div>';
+      html += '<div style="flex:1;min-width:0">';
+      html += '<div style="font-size:12px;font-weight:700;color:' + col + '">' + p.name + '</div>';
+      html += '<div style="font-size:10px;color:var(--t2);margin-top:1px">' + p.desc + '</div>';
+      html += '</div>';
+      html += '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">';
+      html += '<span style="font-size:9px;color:var(--t3)">' + stars(p.level) + '</span>';
+      if (added) {
+        html += '<span style="font-size:10px;color:var(--t3)">✓ Ajouté</span>';
+      } else {
+        html += '<button class="btn btn-xs btn-blu" onclick="importLibPower(\'' + p.id + '\')">➕</button>';
+      }
+      html += '</div></div>';
+    });
+    c.innerHTML = html;
+  }
+  renderMyPowers();
+}
+function importLibPower(libId) {
+  var p = null;
+  POWER_LIB.forEach(function(x){ if(x.id===libId) p=x; });
+  if (!p) return;
+  if ((S.powers[p.type][p.level]||[]).some(function(e){return e.libId===p.id||e.name===p.name;})) {
+    toast('Déjà dans votre liste !','warn'); return;
+  }
+  S.powers[p.type][p.level].push({id:uid(),libId:p.id,name:p.name,desc:p.desc,icon:p.icon,cat:p.cat});
+  save(); renderPowerList(); renderLibrary();
+  toast('"' + p.name + '" ajouté !','ok');
+}
+function renderMyPowers() {
+  var el = document.getElementById('myPowersList'); if (!el) return;
+  var all = [];
+  ['positive','negative'].forEach(function(type) {
+    [1,2,3].forEach(function(lv) {
+      (S.powers[type][lv]||[]).forEach(function(p) {
+        var copy = {};
+        Object.keys(p).forEach(function(k){copy[k]=p[k];});
+        copy._type = type; copy._lv = lv;
+        all.push(copy);
+      });
+    });
+  });
+  if (!all.length) {
+    el.innerHTML = '<div style="color:var(--t3);font-size:11px;text-align:center;padding:11px">Aucun pouvoir — créez-en avec l\'éditeur ci-dessus</div>';
+    return;
+  }
+  // Group by type_lv
+  var groups = {};
+  all.forEach(function(p) {
+    var key = p._type + '_' + p._lv;
+    if (!groups[key]) groups[key] = {type:p._type, lv:p._lv, items:[]};
+    groups[key].items.push(p);
+  });
+  var typeLabel = {positive:'✅ Positifs', negative:'❌ Négatifs'};
+  var catIco = {motricite:'🏃',tactique:'🧠',temps:'⏱',espace:'🗺',score:'💯',contact:'🤝'};
+  var html = '';
+  var sortedKeys = Object.keys(groups).sort();
+  sortedKeys.forEach(function(key) {
+    var g = groups[key];
+    var isPos = g.type === 'positive';
+    var col = isPos ? 'var(--grn)' : 'var(--red)';
+    html += '<div class="mypow-sec" style="color:' + col + '">' + typeLabel[g.type] + ' · Niveau ' + g.lv + ' ' + stars(g.lv) + '</div>';
+    g.items.forEach(function(p) {
+      var icoHtml;
+      if (p.photo) {
+        icoHtml = '<img src="' + p.photo + '" style="width:32px;height:32px;border-radius:7px;object-fit:cover" alt="">';
+      } else {
+        icoHtml = '<div style="width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center">' + renderVisual(p,20) + '</div>';
+      }
+      var ci = catIco[p.cat] || '';
+      var photoBadge = p.photo ? ' 📷' : '';
+      html += '<div class="mypow-item">';
+      html += '<div style="flex-shrink:0">' + icoHtml + '</div>';
+      html += '<div style="flex:1;min-width:0">';
+      html += '<div style="font-size:12px;font-weight:700;color:' + col + '">' + p.name + ' <span style="font-size:10px;color:var(--t3)">' + ci + '</span>' + photoBadge + '</div>';
+      html += '<div style="font-size:10px;color:var(--t2);margin-top:1px">' + p.desc + '</div>';
+      html += '</div>';
+      html += '<button class="btn btn-xs btn-red" onclick="deleteMyPower(\'' + p._type + '\',' + p._lv + ',\'' + p.id + '\')">🗑</button>';
+      html += '</div>';
+    });
+  });
+  el.innerHTML = html;
+}
+function deleteMyPower(type, lv, id) {
+  customConfirm('Supprimer ce pouvoir ?', function(ok) {
+    if (!ok) return;
+    S.powers[type][lv] = (S.powers[type][lv]||[]).filter(function(p){return p.id!==id;});
+    saveGlobal(); renderPowerList(); renderMyPowers(); renderLibrary();
+    toast('Pouvoir supprimé','warn');
+  }, '🗑', 'Supprimer');
+}
+function exportPowers() {
+  var blob = new Blob([JSON.stringify({powers:S.powers},null,2)],{type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'powermatch_pouvoirs.json'; a.click();
+}
+function importPowers(e) {
+  var f = e.target.files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function(ev) {
+    try {
+      var d = JSON.parse(ev.target.result);
+      if (d.powers) {
+        var added = 0;
+        ['positive','negative'].forEach(function(type) {
+          [1,2,3].forEach(function(lv) {
+            var inc = (d.powers[type] || {})[lv] || [];
+            inc.forEach(function(p) {
+              if (!(S.powers[type][lv]||[]).some(function(e){return e.name===p.name;})) {
+                if (!S.powers[type][lv]) S.powers[type][lv] = [];
+                var copy = {}; Object.keys(p).forEach(function(k){copy[k]=p[k];}); copy.id=uid();
+                S.powers[type][lv].push(copy);
+                added++;
+              }
+            });
+          });
+        });
+        save(); renderPowerList(); renderMyPowers(); renderLibrary();
+        toast(added + ' pouvoir(s) importé(s) !','ok');
+      }
+    } catch(ex) { toast('Fichier invalide','err'); }
+  };
+  r.readAsText(f);
+  e.target.value = '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TEAMS
+// ═══════════════════════════════════════════════════════════════
+function pickColor(el) {
+  ntColor = el.dataset.c;
+  document.querySelectorAll('.csw').forEach(function(s){s.classList.remove('on');});
+  el.classList.add('on');
+}
+function addNtPlayer() {
+  var v = document.getElementById('ntPlayer').value.trim();
+  if (!v) return;
+  ntPlayers.push(v);
+  renderNtChips();
+  document.getElementById('ntPlayer').value = '';
+}
+function renderNtChips() {
+  var html = '';
+  ntPlayers.forEach(function(p,i) {
+    html += '<div class="pchip">' + p + '<span class="rm" onclick="removeNt(' + i + ')">×</span></div>';
+  });
+  document.getElementById('ntChips').innerHTML = html;
+}
+function removeNt(i) { ntPlayers.splice(i,1); renderNtChips(); }
+function createTeam() {
+  if (document.getElementById('ntPlayer').value.trim()) addNtPlayer();
+  var name = document.getElementById('ntName').value.trim();
+  if (!name) { toast('Entrez un nom d\'équipe','err'); return; }
+  if (!ntPlayers.length) { toast('Ajoutez au moins 1 joueur','err'); return; }
+  var t = {id:uid(), name:name, color:ntColor, players:ntPlayers.slice(), initials:name.slice(0,2).toUpperCase()};
+  S.teams.push(t);
+  S.ranking[t.id] = {total:0,wins:0,losses:0,draws:0,played:0};
+  t.players.forEach(function(p) {
+    var pid = t.id + '_' + p;
+    S.playerStats[pid] = {name:p,teamId:t.id,teamName:t.name,teamColor:t.color,total:0,n1:0,n10:0,n100:0};
+  });
+  saveClass();
+  ntPlayers = []; renderNtChips(); document.getElementById('ntName').value = '';
+  renderTeamsList(); renderTeamSelects(); renderRanking(); renderStats();
+  toast('"' + name + '" créée !','ok');
+}
+function deleteTeam(id) {
+  customConfirm('Supprimer cette équipe ?', function(ok) {
+    if (!ok) return;
+    S.teams = S.teams.filter(function(t){return t.id!==id;});
+    delete S.ranking[id];
+    Object.keys(S.playerStats).forEach(function(k){ if(k.indexOf(id+'_')===0) delete S.playerStats[k]; });
+    saveClass(); renderTeamsList(); renderTeamSelects(); renderRanking(); renderStats();
+  }, '🗑', 'Supprimer');
+}
+function renderTeamsList() {
+  var c = document.getElementById('teamsList');
+  if (!S.teams.length) { c.innerHTML='<div class="empty"><div class="ei">👥</div><p>Aucune équipe créée.</p></div>'; return; }
+  var ranked = getRanked();
+  var html = '';
+  ranked.forEach(function(t,i) {
+    var r = S.ranking[t.id] || {total:0,played:0};
+    html += '<div class="team-item">';
+    html += '<div class="tbadge" style="background:' + t.color + '1a;color:' + t.color + ';border:1px solid ' + t.color + '40">' + t.initials + '</div>';
+    html += '<div style="flex:1"><div style="font-weight:700;font-size:13px">' + t.name + '</div><div style="font-size:10px;color:var(--t2)">' + t.players.join(' · ') + '</div></div>';
+    html += '<span style="font-family:var(--ft);font-size:14px;color:var(--gold)">#' + (i+1) + '</span>';
+    html += '<button class="btn btn-xs btn-red" onclick="deleteTeam(\'' + t.id + '\')">🗑</button>';
+    html += '</div>';
+  });
+  c.innerHTML = html;
+}
+function renderTeamSelects() {
+  var opts = '<option value="">-- Choisir --</option>';
+  var rOpts = '<option value="">-- Aucun --</option>';
+  S.teams.forEach(function(t) {
+    opts  += '<option value="' + t.id + '">' + t.name + '</option>';
+    rOpts += '<option value="' + t.id + '">' + t.name + '</option>';
+  });
+  ['selA','selB'].forEach(function(id) {
+    var el = document.getElementById(id); var cur = el.value;
+    el.innerHTML = opts; if (cur) el.value = cur;
+  });
+  ['selArb','selObs'].forEach(function(id) {
+    var el = document.getElementById(id); var cur = el.value;
+    el.innerHTML = rOpts; if (cur) el.value = cur;
+  });
+}
+function onTeamSel() {
+  var idA = document.getElementById('selA').value;
+  var idB = document.getElementById('selB').value;
+  var prev = document.getElementById('prevPl');
+  if (idA) {
+    var tA = S.teams.find(function(t){return t.id===idA;});
+    if (tA) {
+      var html=''; tA.players.forEach(function(p){html+='<div class="pchip" style="border-color:'+tA.color+'40;color:'+tA.color+'">'+p+'</div>';});
+      document.getElementById('prevA').innerHTML = html;
+    }
+  }
+  if (idB) {
+    var tB = S.teams.find(function(t){return t.id===idB;});
+    if (tB) {
+      var html=''; tB.players.forEach(function(p){html+='<div class="pchip" style="border-color:'+tB.color+'40;color:'+tB.color+'">'+p+'</div>';});
+      document.getElementById('prevB').innerHTML = html;
+    }
+  }
+  prev.style.display = (idA||idB) ? 'block' : 'none';
+  checkStartPow(idA, idB);
+  document.getElementById('btnStart').disabled = !(idA && idB && idA !== idB);
+}
+function checkStartPow(idA, idB) {
+  var s = document.getElementById('startPwPrev');
+  if (!idA || !idB) { s.style.display='none'; return; }
+  var ranked = getRanked();
+  var ri = function(id) { return ranked.findIndex(function(t){return t.id===id;}); };
+  var gap = Math.abs(ri(idA)-ri(idB));
+  if (gap <= S.rules.noPow) { s.style.display='none'; return; }
+  s.style.display = 'block';
+  var lv = gap <= S.rules.lv1Max ? 1 : 2;
+  var lowerIdx = ri(idA) > ri(idB) ? idA : idB;
+  var lowerT = S.teams.find(function(t){return t.id===lowerIdx;});
+  document.getElementById('startPwInfo').innerHTML = '<span class="tag tg-pur">Niveau ' + lv + ' ' + stars(lv) + '</span><span style="font-size:11px;color:var(--t2);margin-left:6px">Écart ' + gap + ' place(s) — <b style="color:' + (lowerT?lowerT.color:'#fff') + '">' + (lowerT?lowerT.name:'?') + '</b> tirera un pouvoir</span>';
+}
+function toggleChk(id) {
+  var el = document.getElementById(id); el.checked = !el.checked;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// POWERS EDITOR
+// ═══════════════════════════════════════════════════════════════
+function setPType(type, el) {
+  curPType = type;
+  var isPos = type === 'positive';
+  document.getElementById('ptPos').style.cssText = 'flex:1;' + (isPos ? 'background:rgba(0,255,136,.14);color:var(--grn);border:1px solid rgba(0,255,136,.28)' : 'background:rgba(255,255,255,.06);color:var(--t2);border:1px solid var(--brd)');
+  document.getElementById('ptNeg').style.cssText = 'flex:1;' + (!isPos ? 'background:rgba(255,51,102,.14);color:var(--red);border:1px solid rgba(255,51,102,.28)' : 'background:rgba(255,255,255,.06);color:var(--t2);border:1px solid var(--brd)');
+  renderPowerList();
+}
+function setPLevel(lv, el) {
+  curPLevel = lv;
+  document.querySelectorAll('#plv1,#plv2,#plv3').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  renderPowerList();
+}
+function renderPowerList() {
+  var c = document.getElementById('pwList'); if (!c) return;
+  var list = S.powers[curPType][curPLevel] || [];
+  if (!list.length) {
+    c.innerHTML = '<div style="color:var(--t3);font-size:12px;text-align:center;padding:10px">Aucun pouvoir — ajoutez-en ou importez depuis la bibliothèque</div>';
+    return;
+  }
+  var html = '';
+  list.forEach(function(p, i) {
+    var catBadge = p.cat==='motricite' ? '<span style="font-size:9px;color:var(--blu);background:rgba(0,212,255,.1);padding:1px 5px;border-radius:5px;border:1px solid rgba(0,212,255,.18)">🏃</span>' : '';
+    var photoBadge = p.photo ? '<span style="font-size:9px;color:var(--gold)"> 📷</span>' : '';
+    html += '<div class="pw-item">';
+    html += '<div style="width:38px;height:38px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex-shrink:0">' + renderVisual(p,26) + '</div>';
+    html += '<div style="flex:1"><div class="pw-name">' + p.name + ' ' + catBadge + photoBadge + '</div><div class="pw-desc">' + p.desc + '</div></div>';
+    html += '<button class="btn btn-xs btn-red" onclick="removePow(' + i + ')">×</button>';
+    html += '</div>';
+  });
+  c.innerHTML = html;
+}
+function addPower() {
+  var name = document.getElementById('npName').value.trim();
+  var desc = document.getElementById('npDesc').value.trim();
+  var cat  = document.getElementById('npCat').value;
+  if (!name) { toast('Entrez un nom','err'); return; }
+  var pw = {id:uid(), name:name, desc:desc, cat:cat};
+  if (iconInputMode === 'photo' && selectedPhotoB64) {
+    pw.photo = selectedPhotoB64; pw.icon = '📷';
+  } else {
+    var manual = document.getElementById('npIcon').value.trim();
+    pw.icon = manual || selectedIcon || '⚡';
+  }
+  S.powers[curPType][curPLevel].push(pw);
+  saveGlobal(); renderPowerList(); renderMyPowers();
+  document.getElementById('npName').value = '';
+  document.getElementById('npDesc').value = '';
+  document.getElementById('npIcon').value = '';
+  selectedIcon = '⚡';
+  document.getElementById('npIconPrev').textContent = '⚡';
+  resetPhotoUI();
+  toast('Pouvoir ajouté !','ok');
+}
+function removePow(i) {
+  S.powers[curPType][curPLevel].splice(i,1);
+  saveGlobal(); renderPowerList(); renderMyPowers();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RULES
+// ═══════════════════════════════════════════════════════════════
+function saveRules() {
+  S.rules.noPow  = +document.getElementById('rNoPow').value || 1;
+  S.rules.lv1Max = +document.getElementById('rLv1').value   || 4;
+  S.rules.mult   = +document.getElementById('rMult').value  || 3;
+  updMult(S.rules.mult); saveGlobal(); toast('Règles sauvegardées !','ok');
+}
+function updMult(v) {
+  document.getElementById('multD').textContent  = v;
+  document.getElementById('multD2').textContent = v;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MATCH
+// ═══════════════════════════════════════════════════════════════
+function startMatch() {
+  var idA = document.getElementById('selA').value;
+  var idB = document.getElementById('selB').value;
+  if (!idA || !idB || idA===idB) { toast('Choisissez 2 équipes différentes','err'); return; }
+  var tA = S.teams.find(function(t){return t.id===idA;});
+  var tB = S.teams.find(function(t){return t.id===idB;});
+  var perDur  = (+document.getElementById('perdMin').value || 3) * 60;
+  var toutDur = +document.getElementById('toutSec').value || 60;
+  var arbId   = document.getElementById('selArb').value;
+  var obsId   = document.getElementById('selObs').value;
+  var bonusEnabled = document.getElementById('chkBonus').checked;
+  var cloneTeam = function(t) {
+    return {id:t.id,name:t.name,color:t.color,initials:t.initials,players:t.players.slice(),
+            score:0,pts1:0,pts10:0,pts100:0,playerScores:{},playerActs:{}};
+  };
+  S.match = {
+    id:uid(), period:1, periodDur:perDur, toutDur:toutDur, bonusEnabled:bonusEnabled,
+    teamA: cloneTeam(tA), teamB: cloneTeam(tB),
+    arbiter: arbId ? S.teams.find(function(t){return t.id===arbId;}) : null,
+    observer: obsId ? S.teams.find(function(t){return t.id===obsId;}) : null,
+    activePowersA:[], activePowersB:[], powersHistory:[], start:Date.now()
+  };
+  timer = {iv:null, left:perDur, running:false, period:1, inTout:false, toutDur:toutDur, perDur:perDur};
+  document.getElementById('mSetup').style.display = 'none';
+  document.getElementById('mActive').style.display = 'block';
+  document.getElementById('bonusRow').style.display = bonusEnabled ? 'grid' : 'none';
+  renderMatchUI();
+  var ranked = getRanked();
+  var ri = function(id){return ranked.findIndex(function(t){return t.id===id;});};
+  var gap = Math.abs(ri(idA)-ri(idB));
+  if (gap > S.rules.noPow) {
+    var lv = gap <= S.rules.lv1Max ? 1 : 2;
+    var ls = ri(idA) > ri(idB) ? 'A' : 'B';
+    setTimeout(function(){triggerPowerDraw('start',lv,ls);}, 600);
+  }
+  sync({type:'match_start',idA:idA,idB:idB});
+  toast('Match lancé !','ok');
+}
+function renderMatchUI() {
+  var m = S.match; if (!m) return;
+  document.getElementById('mNameA').textContent = m.teamA.name;
+  document.getElementById('mNameB').textContent = m.teamB.name;
+  document.getElementById('spLblA').textContent = m.teamA.name;
+  document.getElementById('spLblB').textContent = m.teamB.name;
+  document.getElementById('pdBadge').textContent = 'MT ' + m.period;
+  document.getElementById('bonusNameA').textContent = m.teamA.name;
+  document.getElementById('bonusNameB').textContent = m.teamB.name;
+  var parts = [];
+  if (m.arbiter)  parts.push('🏁 Arbitre: <b style="color:' + m.arbiter.color + '">' + m.arbiter.name + '</b>');
+  if (m.observer) parts.push('👁 Obs: <b>' + m.observer.name + '</b>');
+  document.getElementById('mRolesBar').innerHTML = parts.join(' | ');
+  updateScore();
+  renderScoreLists();
+  updateTimerDisp();
+}
+function renderScoreLists() {
+  var m = S.match; if (!m) return;
+  ['A','B'].forEach(function(s) {
+    var team = m['team'+s];
+    var c = document.getElementById('sl'+s);
+    if (!team.players || !team.players.length) { c.innerHTML=''; return; }
+    var html = '';
+    team.players.forEach(function(p) {
+      var pts = team.playerScores[p] || 0;
+      var pid = s + '_' + p.replace(/\s/g,'_');
+      html += '<div class="pr">';
+      html += '<div class="pr-name">' + p + '</div>';
+      html += '<div class="pr-pts" id="ppt_' + pid + '">' + pts + '</div>';
+      html += '<div class="sbtns">';
+      html += '<button class="sbtn sbtn-1"   onclick="addPts(\'' + s + '\',\'' + p + '\',1)">+1</button>';
+      html += '<button class="sbtn sbtn-10"  onclick="addPts(\'' + s + '\',\'' + p + '\',10)">+10</button>';
+      html += '<button class="sbtn sbtn-100" onclick="addPts(\'' + s + '\',\'' + p + '\',100)">+100</button>';
+      html += '</div></div>';
+    });
+    c.innerHTML = html;
+  });
+}
+function addPts(side, player, val) {
+  var m = S.match; if (!m) return;
+  var team = m['team'+side];
+  team.playerScores[player] = (team.playerScores[player]||0) + val;
+  team.score += val;
+  if (val===1) team.pts1++; else if (val===10) team.pts10++; else team.pts100++;
+  if (!team.playerActs[player]) team.playerActs[player] = {n1:0,n10:0,n100:0};
+  if (val===1) team.playerActs[player].n1++;
+  else if (val===10) team.playerActs[player].n10++;
+  else team.playerActs[player].n100++;
+  var el = document.getElementById('ppt_' + side + '_' + player.replace(/\s/g,'_'));
+  if (el) el.textContent = team.playerScores[player];
+  updateScore();
+  sync({type:'score',a:m.teamA.score,b:m.teamB.score});
+}
+function setManual(side) {
+  var m = S.match; if (!m) return;
+  var inp = document.getElementById('minp'+side);
+  var v = parseInt(inp.value);
+  if (isNaN(v)||v<0) { toast('Valeur invalide','err'); return; }
+  m['team'+side].score = v; updateScore(); inp.value = '';
+}
+function updateScore() {
+  var m = S.match; if (!m) return;
+  document.getElementById('mScoreA').textContent = m.teamA.score;
+  document.getElementById('mScoreB').textContent = m.teamB.score;
+  document.getElementById('mBreakA').textContent = (m.teamA.pts1||0)+'×1·'+(m.teamA.pts10||0)+'×10·'+(m.teamA.pts100||0)+'×100';
+  document.getElementById('mBreakB').textContent = (m.teamB.pts1||0)+'×1·'+(m.teamB.pts10||0)+'×10·'+(m.teamB.pts100||0)+'×100';
+  renderPwSlots();
+}
+function renderPwSlots() {
+  var m = S.match; if (!m) return;
+  ['A','B'].forEach(function(side) {
+    var list = m['activePowers'+side] || [];
+    var html = '';
+    list.forEach(function(p, i) {
+      var icoHtml;
+      if (p.photo) {
+        icoHtml = '<img src="' + p.photo + '" style="width:16px;height:16px;border-radius:3px;object-fit:cover;flex-shrink:0" alt="">';
+      } else {
+        icoHtml = renderVisual(p, 16);
+      }
+      html += '<div class="pw-chip ' + p.powerType + '">';
+      html += '<span style="display:inline-flex;align-items:center;flex-shrink:0">' + icoHtml + '</span>';
+      html += '<span class="pc-txt">' + p.name + '</span>';
+      html += '<span style="font-size:8px;opacity:.55">Niv.' + p.level + '</span>';
+      html += '<span class="pc-rev" onclick="revokePower(\'' + side + '\',' + i + ')" title="Révoquer">✕</span>';
+      html += '</div>';
+    });
+    document.getElementById('pwSlot'+side).innerHTML = html;
+  });
+}
+function revokePower(side, idx) {
+  var m = S.match; if (!m) return;
+  var list = m['activePowers'+side];
+  var p = list[idx]; if (!p) return;
+  customConfirm('Révoquer "' + p.name + '" ? (Arbitre)', function(ok) {
+    if (!ok) return;
+    list.splice(idx, 1);
+    renderPwSlots();
+    toast('"' + p.name + '" révoqué','warn');
+  }, '⚖️', 'Révoquer');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BONUS 1000
+// ═══════════════════════════════════════════════════════════════
+function grantBonus(side) {
+  bonusPendingSide = side;
+  var team = S.match['team'+side];
+  document.getElementById('bcTeam').innerHTML = '<span style="color:' + team.color + '">' + team.name + '</span>';
+  document.getElementById('bcOv').classList.add('on');
+}
+function closeBc() { document.getElementById('bcOv').classList.remove('on'); bonusPendingSide=null; }
+function confirmBonus() {
+  var m = S.match; if (!m || !bonusPendingSide) return;
+  var team = m['team'+bonusPendingSide];
+  team.score += 1000; team.pts100 += 10;
+  closeBc(); updateScore();
+  toast('⭐ BONUS 1000pts attribué à ' + team.name + ' !','ok');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════════
+function updateTimerDisp() {
+  var m = Math.floor(timer.left/60), s = timer.left%60;
+  var el = document.getElementById('timerDisp');
+  el.textContent = m + ':' + (s<10?'0':'') + s;
+  el.className = 'timer-big';
+  if (timer.left <= 10) el.classList.add('danger');
+  else if (timer.left <= 30) el.classList.add('warn');
+}
+function timerPlay() {
+  if (timer.running) return;
+  timer.running = true;
+  document.getElementById('btnPlay').disabled = true;
+  document.getElementById('btnStop').disabled = false;
+  timer.iv = setInterval(function() {
+    timer.left--; updateTimerDisp();
+    if (timer.left <= 0) { timerStop(); onTimerEnd(); }
+  }, 1000);
+}
+function timerStop() {
+  timer.running = false; clearInterval(timer.iv);
+  document.getElementById('btnPlay').disabled = false;
+  document.getElementById('btnStop').disabled = true;
+}
+function timerReset() {
+  timerStop(); timer.left = timer.inTout ? timer.toutDur : timer.perDur;
+  timer.inTout = false; updateTimerDisp();
+}
+function onTimerEnd() {
+  if (timer.inTout) { timer.inTout=false; timer.left=timer.perDur; updateTimerDisp(); toast('Temps mort terminé','warn'); return; }
+  if (timer.period===1) showHalftime(); else endMatch();
+}
+function callTimeout() {
+  timerStop(); timer.inTout=true; timer.left=timer.toutDur; updateTimerDisp(); timerPlay();
+  toast('⏱ Temps mort !','warn');
+  var m = S.match; if (!m) return;
+  var lv = getPowLevel(m); if (lv>0) setTimeout(function(){triggerPowerDraw('timeout',lv);}, 500);
+}
+function getPowLevel(m) {
+  var a100=m.teamA.pts100||0, b100=m.teamB.pts100||0, mult=S.rules.mult;
+  var aw=m.teamA.score>=m.teamB.score, wP=aw?a100:b100, lP=aw?b100:a100;
+  if (wP===0&&lP===0) return 0;
+  if (wP>0&&lP===0) return 3;
+  if (wP>=mult*lP&&lP>0) return 2;
+  if (wP>0) return 1;
+  return 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HALFTIME
+// ═══════════════════════════════════════════════════════════════
+function showHalftime() {
+  var m = S.match; if (!m) return; timerStop();
+  var lv = getPowLevel(m);
+  document.getElementById('htScore').innerHTML = '<span style="color:' + m.teamA.color + '">' + m.teamA.name + ': ' + m.teamA.score + '</span> — <span style="color:' + m.teamB.color + '">' + m.teamB.name + ': ' + m.teamB.score + '</span>';
+  document.getElementById('htPowInfo').textContent = lv>0 ? 'Niveau '+lv+' — L\'équipe perdante choisit' : 'Aucun écart — pas de pouvoir';
+  document.getElementById('htOv').classList.add('on');
+}
+function htPowerDraw() {
+  var m = S.match; var lv = getPowLevel(m);
+  document.getElementById('htOv').classList.remove('on');
+  if (lv>0) triggerPowerDraw('halftime', lv);
+}
+function startP2() {
+  document.getElementById('htOv').classList.remove('on');
+  var m = S.match; if (!m) return;
+  m.period=2; timer.period=2; timer.left=timer.perDur; updateTimerDisp();
+  document.getElementById('pdBadge').textContent = 'MT 2';
+  toast('2ème mi-temps !','info');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// POWER DRAW
+// ═══════════════════════════════════════════════════════════════
+function triggerPowerDraw(ctx, level, losingSide) {
+  var m = S.match; if (!m) return;
+  var lv = level || getPowLevel(m);
+  if (!lv && ctx!=='manual') { toast('Pas d\'écart pour un pouvoir','info'); return; }
+  if (!lv) lv = 1;
+  pendPow.level = lv; pendPow.rerolled = false; pendPow.ctx = ctx;
+  var losingTeam;
+  if (losingSide) losingTeam = m['team'+losingSide];
+  else losingTeam = m.teamA.score <= m.teamB.score ? m.teamA : m.teamB;
+  var ctxText = {
+    start:    'Écart classement — <b>' + losingTeam.name + '</b> choisit',
+    halftime: 'Mi-temps — <b>' + losingTeam.name + '</b> choisit',
+    timeout:  'Temps mort — Remplacement possible',
+    manual:   '<b>' + losingTeam.name + '</b> choisit son avantage'
+  };
+  document.getElementById('pwcSub').textContent = 'Niveau ' + lv + ' ' + stars(lv);
+  document.getElementById('pwcCtx').innerHTML = ctxText[ctx] || 'Choisissez le type';
+  document.getElementById('pwChoiceOv').classList.add('on');
+}
+function closePwChoice() { document.getElementById('pwChoiceOv').classList.remove('on'); }
+function drawPower(type) {
+  closePwChoice(); pendPow.type = type;
+  var list = S.powers[type][pendPow.level] || [];
+  if (!list.length) { toast('Aucun pouvoir niv.'+pendPow.level+' ('+type+') ! Ajoutez-en dans les réglages.','err'); return; }
+  var card = list[Math.floor(Math.random()*list.length)];
+  pendPow.card = card; showReveal(card, type, pendPow.level);
+}
+function showReveal(card, type, level) {
+  var isPos = type === 'positive';
+  var artHtml;
+  if (card.photo) {
+    artHtml = '<img src="' + card.photo + '" style="width:100%;height:100%;object-fit:cover;display:block" alt="">';
+  } else {
+    var ic = card.icon || '⚡';
+    if (ic.indexOf('svg_')===0 && SVG_ICONS[ic]) {
+      artHtml = '<div style="width:70px;height:70px">' + SVG_ICONS[ic].svg.replace('class="svg-icon"','style="width:70px;height:70px"') + '</div>';
+    } else {
+      artHtml = '<span style="font-size:60px">' + ic + '</span>';
+    }
+  }
+  var catLabel = card.cat==='motricite' ? '🏃 Motricité' : (card.cat==='tactique' ? '🧠 Tactique' : '💯 Score');
+  var html = '<div class="pw-card ' + (isPos?'pos':'neg') + '"><div class="pw-shine"></div>';
+  html += '<div class="pwcard-hdr"><div class="pwcard-badge">' + (isPos?'✅ BONUS':'❌ MALUS') + '</div><div>' + stars(level) + '</div></div>';
+  html += '<div class="pwcard-art" style="' + (card.photo?'padding:0;overflow:hidden':'') + '">' + artHtml + '</div>';
+  html += '<div class="pwcard-body">';
+  html += '<div class="pwcard-name">' + card.name + '</div>';
+  html += '<div class="pwcard-desc">' + card.desc + '</div>';
+  html += '<div class="pwcard-dur">♾ Permanent · révocable par arbitre</div>';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)">';
+  html += '<span style="font-size:9px;color:rgba(255,255,255,.28)">' + catLabel + ' · Niv.' + level + '</span>';
+  html += '<span class="tag ' + (isPos?'tg-grn':'tg-red') + '">' + (isPos?'POSITIF':'NÉGATIF') + '</span>';
+  html += '</div></div></div>';
+  document.getElementById('pwCardWrap').innerHTML = html;
+  document.getElementById('rerollBtn').disabled = pendPow.rerolled;
+  document.getElementById('pwRevealOv').classList.add('on');
+}
+function rerollPower() {
+  if (pendPow.rerolled) { toast('Déjà repiché !','err'); return; }
+  pendPow.rerolled = true;
+  var list = S.powers[pendPow.type][pendPow.level] || []; if (!list.length) return;
+  var card = list[Math.floor(Math.random()*list.length)];
+  pendPow.card = card; showReveal(card, pendPow.type, pendPow.level);
+  toast('Nouveau tirage !','info');
+}
+function acceptPower() {
+  document.getElementById('pwRevealOv').classList.remove('on');
+  var m = S.match; if (!m || !pendPow.card) return;
+  var card = pendPow.card; var isPos = pendPow.type==='positive';
+  var ap = {id:card.id,libId:card.libId,name:card.name,desc:card.desc,icon:card.icon,photo:card.photo,cat:card.cat,
+            powerType:pendPow.type, level:pendPow.level, appliedAt:Date.now()};
+  m.powersHistory.push(ap);
+  var losingIsA = m.teamA.score <= m.teamB.score;
+  if (isPos) { if (losingIsA) m.activePowersA.push(ap); else m.activePowersB.push(ap); }
+  else        { if (losingIsA) m.activePowersB.push(ap); else m.activePowersA.push(ap); }
+  renderPwSlots();
+  toast('⚡ ' + card.name + ' activé !','ok');
+  sync({type:'power', power:ap});
+}
+
+// ═══════════════════════════════════════════════════════════════
+// END MATCH
+// ═══════════════════════════════════════════════════════════════
+function endMatch() {
+  var m = S.match; if (!m) return; timerStop();
+  var win = m.teamA.score > m.teamB.score ? m.teamA : (m.teamA.score < m.teamB.score ? m.teamB : null);
+  var lose = win===m.teamA ? m.teamB : m.teamA;
+  [m.teamA, m.teamB].forEach(function(t) {
+    if (!S.ranking[t.id]) S.ranking[t.id]={total:0,wins:0,losses:0,draws:0,played:0};
+    S.ranking[t.id].total += t.score; S.ranking[t.id].played++;
+  });
+  if (win) { S.ranking[win.id].wins++; S.ranking[lose.id].losses++; }
+  else { S.ranking[m.teamA.id].draws++; S.ranking[m.teamB.id].draws++; }
+  // Save player stats
+  if (!Array.isArray(S.history)) S.history = [];
+  if (!S.playerStats || typeof S.playerStats !== 'object') S.playerStats = {};
+  ['A','B'].forEach(function(side) {
+    var team = m['team'+side];
+    if (!team || !Array.isArray(team.players)) return;
+    team.players.forEach(function(p) {
+      var pid = team.id + '_' + p;
+      if (!S.playerStats[pid]) S.playerStats[pid]={name:p,teamId:team.id,teamName:team.name,teamColor:team.color,total:0,n1:0,n10:0,n100:0};
+      var acts = (team.playerActs && team.playerActs[p]) ? team.playerActs[p] : {n1:0,n10:0,n100:0};
+      S.playerStats[pid].total += (team.playerScores && team.playerScores[p]) ? team.playerScores[p] : 0;
+      S.playerStats[pid].n1  = (S.playerStats[pid].n1||0)  + (acts.n1||0);
+      S.playerStats[pid].n10 = (S.playerStats[pid].n10||0) + (acts.n10||0);
+      S.playerStats[pid].n100= (S.playerStats[pid].n100||0)+ (acts.n100||0);
+    });
+  });
+  // Build player snapshots so we can recompute stats from history later
+  var snapA = [], snapB = [];
+  ['A','B'].forEach(function(side) {
+    var team = m['team'+side];
+    var snap = side==='A' ? snapA : snapB;
+    if (!team || !Array.isArray(team.players)) return;
+    team.players.forEach(function(p) {
+      var acts = (team.playerActs && team.playerActs[p]) ? team.playerActs[p] : {n1:0,n10:0,n100:0};
+      snap.push({
+        pid: team.id+'_'+p, name:p, teamId:team.id, teamName:team.name, teamColor:team.color,
+        total: (team.playerScores && team.playerScores[p]) ? team.playerScores[p] : 0,
+        n1: acts.n1||0, n10: acts.n10||0, n100: acts.n100||0
+      });
+    });
+  });
+  S.history.push({
+    id:m.id, date:new Date().toLocaleDateString('fr-FR'),
+    teamA:{name:m.teamA.name,score:m.teamA.score,color:m.teamA.color},
+    teamB:{name:m.teamB.name,score:m.teamB.score,color:m.teamB.color},
+    winner:win?win.name:null, powers:m.powersHistory,
+    playerSnapshotA: snapA, playerSnapshotB: snapB
+  });
+  save();
+  // Show endgame overlay
+  document.querySelector('.eg-trophy').textContent = win ? '🏆' : '🤝';
+  document.getElementById('egWinner').textContent = win ? win.name.toUpperCase() : 'MATCH NUL';
+  document.getElementById('egScore').innerHTML = '<span style="color:'+m.teamA.color+'">'+m.teamA.name+': '+m.teamA.score+'</span> — <span style="color:'+m.teamB.color+'">'+m.teamB.name+': '+m.teamB.score+'</span>';
+  var pwHtml = '';
+  m.powersHistory.forEach(function(p) {
+    var icoHtml = p.photo ? '<img src="'+p.photo+'" style="width:12px;height:12px;border-radius:2px;object-fit:cover" alt="">' : '<span>'+( p.icon && p.icon.indexOf('svg_')===0 ? '🎴' : (p.icon||'⚡') )+'</span>';
+    pwHtml += '<span class="tag '+(p.powerType==='positive'?'tg-grn':'tg-red')+'" style="display:inline-flex;align-items:center;gap:2px">'+icoHtml+' '+p.name+'</span>';
+  });
+  document.getElementById('egPowers').innerHTML = pwHtml || '<span style="color:var(--t3);font-size:11px">Aucun pouvoir</span>';
+  document.getElementById('egOv').classList.add('on');
+  sync({type:'match_end', ranking:S.ranking});
+}
+function egClose() { document.getElementById('egOv').classList.remove('on'); }
+function newMatch() {
+  egClose(); S.match=null;
+  document.getElementById('mActive').style.display = 'none';
+  document.getElementById('mSetup').style.display = 'block';
+  document.getElementById('selA').value=''; document.getElementById('selB').value='';
+  document.getElementById('btnStart').disabled=true;
+  document.getElementById('prevPl').style.display='none';
+  document.getElementById('startPwPrev').style.display='none';
+  document.getElementById('chkBonus').checked=false;
+  timer={iv:null,left:180,running:false,period:1,inTout:false,toutDur:60,perDur:180};
+  renderRanking(); renderStats();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RANKING
+// ═══════════════════════════════════════════════════════════════
+function getRanked() {
+  return S.teams.slice().sort(function(a,b){ return (S.ranking[b.id]&&S.ranking[b.id].total||0)-(S.ranking[a.id]&&S.ranking[a.id].total||0); });
+}
+function showRkTab(t, el) {
+  document.getElementById('rkGen').style.display  = t==='gen'  ? 'block' : 'none';
+  document.getElementById('rkHist').style.display = t==='hist' ? 'block' : 'none';
+  document.querySelectorAll('#classementScreen .itab').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+}
+function renderRanking() {
+  var cg = document.getElementById('rkGen');
+  var ch = document.getElementById('rkHist');
+  if (!cg || !ch) return;
+  if (!S.teams.length) {
+    cg.innerHTML = '<div class="empty"><div class="ei">🏆</div><p>Aucune équipe.</p></div>'; return;
+  }
+  var ranked = getRanked();
+  var medals = ['g','s','b'];
+  var html = '<table class="rtable"><thead><tr><th>#</th><th>Équipe</th><th>Score</th><th>J</th><th>V</th><th>D</th></tr></thead><tbody>';
+  ranked.forEach(function(t, i) {
+    var r = S.ranking[t.id] || {total:0,wins:0,losses:0,draws:0,played:0};
+    html += '<tr>';
+    html += '<td><div class="rk-pos '+(medals[i]||'')+'">'+(i+1)+'</div></td>';
+    html += '<td><div style="display:flex;align-items:center;gap:6px"><div class="tbadge" style="width:26px;height:26px;border-radius:6px;font-size:10px;background:'+t.color+'1a;color:'+t.color+';border:1px solid '+t.color+'40">'+t.initials+'</div><div style="font-weight:700;font-size:12px">'+t.name+'</div></div></td>';
+    html += '<td class="rk-stat pts">'+r.total+'</td>';
+    html += '<td class="rk-stat p">'+r.played+'</td>';
+    html += '<td class="rk-stat v">'+r.wins+'</td>';
+    html += '<td class="rk-stat d">'+r.losses+'</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  cg.innerHTML = html;
+  if (!S.history.length) {
+    ch.innerHTML = '<div class="empty"><div class="ei">📋</div><p>Aucun match terminé.</p></div>';
+  } else {
+    var hhtml = '<div style="font-size:10px;color:var(--t3);margin-bottom:8px;padding:0 2px">Appuyez sur 🗑 pour annuler un match erreur — le classement et les stats sont recalculés automatiquement.</div>';
+    var hist = S.history.slice().reverse();
+    hist.forEach(function(m) {
+      var pwHtml = '';
+      (m.powers||[]).forEach(function(p){
+        var ic = p.icon && p.icon.indexOf('svg_')===0 ? '🎴' : (p.icon||'⚡');
+        pwHtml += '<span class="tag '+(p.powerType==='positive'?'tg-grn':'tg-red')+'" style="font-size:8px">'+ic+' '+p.name+'</span>';
+      });
+      hhtml += '<div class="mh-item" style="flex-wrap:wrap;gap:6px">';
+      hhtml += '<div style="font-size:9px;color:var(--t3);flex-shrink:0;min-width:42px">'+m.date+'</div>';
+      hhtml += '<div style="flex:1;min-width:120px;font-size:11px">';
+      hhtml += '<span style="color:'+m.teamA.color+'">'+m.teamA.name+'</span> vs <span style="color:'+m.teamB.color+'">'+m.teamB.name+'</span>';
+      hhtml += m.winner ? '<div style="font-size:9px;color:var(--gold)">🏆 '+m.winner+'</div>' : '<div style="font-size:9px;color:var(--t2)">Match nul</div>';
+      if (pwHtml) hhtml += '<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px">'+pwHtml+'</div>';
+      hhtml += '</div>';
+      hhtml += '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">';
+      hhtml += '<div style="font-family:var(--ft);font-size:13px;font-weight:700;color:var(--gold)">'+m.teamA.score+'—'+m.teamB.score+'</div>';
+      hhtml += '<button class="btn btn-xs btn-red" onclick="deleteMatch(\'' + m.id + '\')" title="Annuler ce match">&#128465;</button>';
+      hhtml += '</div>';
+      hhtml += '</div>';
+    });
+    ch.innerHTML = hhtml;
+  }
+}
+// Recompute ranking + playerStats entirely from history
+// (playerStats action counts n1/n10/n100 come from match snapshots stored in history)
+function recomputeFromHistory() {
+  // Reset ranking
+  S.teams.forEach(function(t){
+    S.ranking[t.id] = {total:0,wins:0,losses:0,draws:0,played:0};
+  });
+  // Reset playerStats counts (keep name/team metadata, zero the numbers)
+  Object.keys(S.playerStats).forEach(function(k){
+    S.playerStats[k].total=0; S.playerStats[k].n1=0; S.playerStats[k].n10=0; S.playerStats[k].n100=0;
+  });
+  // Replay every match
+  if (!Array.isArray(S.history)) S.history = [];
+  S.history.forEach(function(m) {
+    var tA = S.teams.find(function(t){return t.name===m.teamA.name;});
+    var tB = S.teams.find(function(t){return t.name===m.teamB.name;});
+    // ranking
+    if (tA) {
+      if (!S.ranking[tA.id]) S.ranking[tA.id]={total:0,wins:0,losses:0,draws:0,played:0};
+      S.ranking[tA.id].total += m.teamA.score;
+      S.ranking[tA.id].played++;
+    }
+    if (tB) {
+      if (!S.ranking[tB.id]) S.ranking[tB.id]={total:0,wins:0,losses:0,draws:0,played:0};
+      S.ranking[tB.id].total += m.teamB.score;
+      S.ranking[tB.id].played++;
+    }
+    if (m.winner) {
+      var winTeam = m.teamA.name===m.winner ? tA : tB;
+      var loseTeam = m.teamA.name===m.winner ? tB : tA;
+      if (winTeam  && S.ranking[winTeam.id])  S.ranking[winTeam.id].wins++;
+      if (loseTeam && S.ranking[loseTeam.id]) S.ranking[loseTeam.id].losses++;
+    } else {
+      if (tA && S.ranking[tA.id]) S.ranking[tA.id].draws++;
+      if (tB && S.ranking[tB.id]) S.ranking[tB.id].draws++;
+    }
+    // player stats — stored per match snapshot
+    var allSides = (m.playerSnapshotA||[]).concat(m.playerSnapshotB||[]);
+    allSides.forEach(function(snap) {
+      var pid = snap.pid;
+      if (!S.playerStats[pid]) S.playerStats[pid]={name:snap.name,teamId:snap.teamId,teamName:snap.teamName,teamColor:snap.teamColor,total:0,n1:0,n10:0,n100:0};
+      S.playerStats[pid].total += snap.total||0;
+      S.playerStats[pid].n1   += snap.n1||0;
+      S.playerStats[pid].n10  += snap.n10||0;
+      S.playerStats[pid].n100 += snap.n100||0;
+    });
+  });
+}
+
+function deleteMatch(matchId) {
+  customConfirm('Annuler ce match ? Le classement sera recalculé automatiquement.', function(ok) {
+    if (!ok) return;
+    if (!Array.isArray(S.history)) S.history = [];
+    S.history = S.history.filter(function(m){return m.id !== matchId;});
+    recomputeFromHistory();
+    saveClass();
+    renderRanking(); renderStats();
+    toast('Match annulé — classement recalculé','warn');
+  }, '🗑', 'Annuler le match');
+}
+
+function resetRanking() {
+  customConfirm('Réinitialiser le classement et les statistiques ?', function(ok) {
+    if (!ok) return;
+    S.history = [];
+    recomputeFromHistory();
+    saveClass(); renderRanking(); renderStats(); toast('Classement réinitialisé','warn');
+  }, '🔄', 'Réinitialiser');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════════════════
+function actTotal(p) { return (p.n1||0)+(p.n10||0)+(p.n100||0); }
+function showStTab(t, el) {
+  document.getElementById('stPl').style.display = t==='pl' ? 'block' : 'none';
+  document.getElementById('stTm').style.display = t==='tm' ? 'block' : 'none';
+  document.querySelectorAll('#statsScreen .itab').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+}
+function renderStats() {
+  var all = Object.values(S.playerStats);
+  var totalActs  = all.reduce(function(s,p){return s+actTotal(p);}, 0);
+  var total100   = all.reduce(function(s,p){return s+(p.n100||0);}, 0);
+  var total10    = all.reduce(function(s,p){return s+(p.n10||0);}, 0);
+  var total1     = all.reduce(function(s,p){return s+(p.n1||0);}, 0);
+  var sb = document.getElementById('stBoxes'); if (!sb) return;
+  sb.innerHTML =
+    '<div class="sb-box"><div class="sb-val" style="color:var(--blu)">'  + totalActs + '</div><div class="sb-lbl">Actions totales</div></div>' +
+    '<div class="sb-box"><div class="sb-val" style="color:var(--gold)">' + total100  + '</div><div class="sb-lbl">Fois 100pts</div></div>' +
+    '<div class="sb-box"><div class="sb-val" style="color:var(--grn)">'  + total1    + '</div><div class="sb-lbl">Fois 1pt</div></div>' +
+    '<div class="sb-box"><div class="sb-val" style="color:var(--pur)">'  + total10   + '</div><div class="sb-lbl">Fois 10pts</div></div>';
+  // Players tab
+  var sorted = all.filter(function(p){return actTotal(p)>0;}).sort(function(a,b){return actTotal(b)-actTotal(a);});
+  var medals = ['g','s','b'];
+  var pc = document.getElementById('stPl'); if (!pc) return;
+  if (!sorted.length) {
+    pc.innerHTML = '<div class="empty"><div class="ei">📊</div><p>Jouez des matchs pour voir les stats !</p></div>';
+  } else {
+    var html = '';
+    sorted.forEach(function(p, i) {
+      var tc = (S.teams.find(function(t){return t.id===p.teamId;})||{}).color || '#888';
+      var tot = actTotal(p);
+      var n1=p.n1||0, n10=p.n10||0, n100=p.n100||0;
+      var p1   = tot ? Math.round(n1/tot*100)   : 0;
+      var p10  = tot ? Math.round(n10/tot*100)  : 0;
+      var p100 = 100 - p1 - p10;
+      html += '<div class="pstat">';
+      // header
+      html += '<div class="ps-hdr">';
+      html += '<div class="ps-rank '+(medals[i]||'')+'">'+(i+1)+'</div>';
+      html += '<div style="flex:1"><div style="font-size:14px;font-weight:700">'+p.name+'</div><div style="font-size:10px;color:'+tc+';margin-top:1px">'+(p.teamName||'?')+'</div></div>';
+      html += '<div class="ps-total"><div class="ps-total-n">'+tot+'</div><div class="ps-total-l">FOIS MARQUÉ</div></div>';
+      html += '</div>';
+      // bar — 1pt=orange, 10pts=green, 100pts=blue
+      html += '<div class="act-bar">';
+      if (n1>0)   html += '<div style="flex:'+n1+';background:var(--ora)"  title="'+n1+'x 1pt"></div>';
+      if (n10>0)  html += '<div style="flex:'+n10+';background:var(--grn)" title="'+n10+'x 10pts"></div>';
+      if (n100>0) html += '<div style="flex:'+n100+';background:var(--blu)" title="'+n100+'x 100pts"></div>';
+      html += '</div>';
+      // pills — dominant gets highlighted
+      // Colors: 1pt=orange, 10pts=green, 100pts=blue (user spec)
+      var dom = n1>=n10 && n1>=n100 ? '1' : (n10>=n100 ? '10' : '100');
+      html += '<div class="act-pills">';
+      html += '<div class="act-pill ap-ora' + (dom==='1'?' dominant':'') + '">';
+      html += '<span class="act-dot" style="background:var(--ora)"></span>';
+      html += '<span class="act-n" style="color:var(--ora)">'+n1+'×</span>';
+      html += '<span class="act-l">1pt</span>';
+      html += '<span class="act-p" style="font-size:'+(dom==='1'?'13':'10')+'px;font-weight:'+(dom==='1'?'800':'400')+';color:'+(dom==='1'?'var(--ora)':'var(--t3)')+'">' + p1 + '%</span>';
+      if(dom==='1') html += '<span style="font-size:9px;color:var(--ora)"> ★</span>';
+      html += '</div>';
+      html += '<div class="act-pill ap-grn' + (dom==='10'?' dominant':'') + '">';
+      html += '<span class="act-dot" style="background:var(--grn)"></span>';
+      html += '<span class="act-n" style="color:var(--grn)">'+n10+'×</span>';
+      html += '<span class="act-l">10pts</span>';
+      html += '<span class="act-p" style="font-size:'+(dom==='10'?'13':'10')+'px;font-weight:'+(dom==='10'?'800':'400')+';color:'+(dom==='10'?'var(--grn)':'var(--t3)')+'">' + p10 + '%</span>';
+      if(dom==='10') html += '<span style="font-size:9px;color:var(--grn)"> ★</span>';
+      html += '</div>';
+      html += '<div class="act-pill ap-blu' + (dom==='100'?' dominant':'') + '">';
+      html += '<span class="act-dot" style="background:var(--blu)"></span>';
+      html += '<span class="act-n" style="color:var(--blu)">'+n100+'×</span>';
+      html += '<span class="act-l">100pts</span>';
+      html += '<span class="act-p" style="font-size:'+(dom==='100'?'13':'10')+'px;font-weight:'+(dom==='100'?'800':'400')+';color:'+(dom==='100'?'var(--blu)':'var(--t3)')+'">' + p100 + '%</span>';
+      if(dom==='100') html += '<span style="font-size:9px;color:var(--blu)"> ★</span>';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+    });
+    pc.innerHTML = html;
+  }
+  // Teams tab
+  var tc2 = document.getElementById('stTm'); if (!tc2) return;
+  var teamAgg = S.teams.map(function(t) {
+    var pl = all.filter(function(p){return p.teamId===t.id;});
+    return {team:t, players:pl, totAct:pl.reduce(function(s,p){return s+actTotal(p);},0),
+            tn1:pl.reduce(function(s,p){return s+(p.n1||0);},0),
+            tn10:pl.reduce(function(s,p){return s+(p.n10||0);},0),
+            tn100:pl.reduce(function(s,p){return s+(p.n100||0);},0)};
+  }).sort(function(a,b){return b.totAct-a.totAct;});
+  if (!teamAgg.some(function(x){return x.totAct>0;})) {
+    tc2.innerHTML = '<div class="empty"><div class="ei">📊</div><p>Aucune statistique encore.</p></div>'; return;
+  }
+  var thtml = '';
+  teamAgg.forEach(function(x) {
+    var t=x.team, pl=x.players.filter(function(p){return actTotal(p)>0;}).sort(function(a,b){return actTotal(b)-actTotal(a);});
+    thtml += '<div class="card" style="margin-bottom:11px">';
+    thtml += '<div class="ctitle" style="color:'+t.color+'">';
+    thtml += '<div class="tbadge" style="width:22px;height:22px;border-radius:5px;font-size:9px;background:'+t.color+'1a;color:'+t.color+';border:1px solid '+t.color+'40;display:flex;align-items:center;justify-content:center">'+t.initials+'</div>';
+    thtml += t.name + ' <span style="color:var(--t2);font-weight:400;font-size:11px">'+x.totAct+' actions</span>';
+    thtml += ' · <span style="color:var(--grn)">'+x.tn1+'×1</span> <span style="color:var(--blu)">'+x.tn10+'×10</span> <span style="color:var(--gold)">'+x.tn100+'×100</span>';
+    thtml += '</div>';
+    pl.forEach(function(p) {
+      var tot=actTotal(p);
+      thtml += '<div style="display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)">';
+      thtml += '<div style="flex:1;font-size:12px;font-weight:600">'+p.name+'</div>';
+      thtml += '<div style="font-family:var(--ft);font-size:14px;font-weight:700;color:var(--gold);min-width:24px;text-align:right">'+tot+'×</div>';
+      thtml += '<div style="display:flex;gap:3px">';
+      thtml += '<span style="font-size:10px;color:var(--grn);background:rgba(0,255,136,.09);padding:2px 5px;border-radius:5px">'+p.n1+'×1</span>';
+      thtml += '<span style="font-size:10px;color:var(--blu);background:rgba(0,212,255,.09);padding:2px 5px;border-radius:5px">'+p.n10+'×10</span>';
+      thtml += '<span style="font-size:10px;color:var(--gold);background:rgba(240,192,64,.09);padding:2px 5px;border-radius:5px">'+p.n100+'×100</span>';
+      thtml += '</div></div>';
+    });
+    thtml += '</div>';
+  });
+  tc2.innerHTML = thtml;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REGLAGES TABS
+// ═══════════════════════════════════════════════════════════════
+var regTabIds = ['teams','powers','rules','net'];
+function showRegTab(t, el) {
+  regTabIds.forEach(function(x) {
+    document.getElementById('reg'+x.charAt(0).toUpperCase()+x.slice(1)).style.display = x===t?'block':'none';
+  });
+  document.querySelectorAll('#reglagesScreen .itab').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  if (t==='powers') { renderPowerList(); renderLibrary(); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NETWORK
+// ═══════════════════════════════════════════════════════════════
+function setNetMode(m) {
+  S.wsMode = m;
+  document.getElementById('netMaster').style.display = m==='master'?'block':'none';
+  document.getElementById('netClient').style.display = m==='client'?'block':'none';
+  document.getElementById('netNone').style.display   = 'none';
+  document.getElementById('btnMaster').className = 'btn ' + (m==='master'?'btn-gld':'btn-gst');
+  document.getElementById('btnClient').className = 'btn ' + (m==='client'?'btn-blu':'btn-gst');
+}
+function startMaster() {
+  var ip   = document.getElementById('mIP').value.trim();
+  var port = document.getElementById('mPort').value || '8080';
+  if (!ip) { toast('Entrez l\'IP','err'); return; }
+  document.getElementById('mIPDisp').textContent = 'ws://' + ip + ':' + port;
+  if (typeof BroadcastChannel !== 'undefined') {
+    window._bc = new BroadcastChannel('pm4');
+    window._bc.onmessage = function(e){ onNet(e.data); };
+  }
+  updateConn('ok','Maître'); toast('Serveur actif','ok');
+}
+function connectMaster() {
+  var ip   = document.getElementById('cIP').value.trim();
+  var port = document.getElementById('cPort').value || '8080';
+  var name = document.getElementById('tName').value.trim() || 'Tablette';
+  if (!ip) { toast('Entrez l\'IP','err'); return; }
+  updateConn('wait','Connexion…');
+  try {
+    var ws = new WebSocket('ws://'+ip+':'+port);
+    S.ws = ws;
+    ws.onopen    = function(){ updateConn('ok',name); ws.send(JSON.stringify({type:'join',name:name})); toast('Connecté !','ok'); };
+    ws.onmessage = function(e){ try{onNet(JSON.parse(e.data));}catch(x){} };
+    ws.onclose   = function(){ updateConn('err','Déconnecté'); };
+    ws.onerror   = function(){ updateConn('err','Erreur'); toast('Connexion échouée','err'); };
+  } catch(e) { toast('Adresse invalide','err'); updateConn('err','Déconnecté'); }
+}
+function sync(data) {
+  if (S.ws && S.ws.readyState===1) S.ws.send(JSON.stringify(data));
+  if (window._bc) window._bc.postMessage(data);
+}
+function onNet(data) {
+  if (!data || !data.type) return;
+  if (data.type==='match_end' && data.ranking) {
+    Object.keys(data.ranking).forEach(function(k){ S.ranking[k]=data.ranking[k]; });
+    save(); renderRanking(); renderStats(); toast('📡 Classement mis à jour','info');
+  }
+}
+function updateConn(status, label) {
+  document.getElementById('cdot').className = 'cdot ' + status;
+  document.getElementById('clabel').textContent = label;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DATA EXPORT / IMPORT / CLEAR
+// ═══════════════════════════════════════════════════════════════
+function exportData() {
+  var blob = new Blob([JSON.stringify({teams:S.teams,powers:S.powers,rules:S.rules,ranking:S.ranking,history:S.history,playerStats:S.playerStats},null,2)],{type:'application/json'});
+  var a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='powermatch_data.json'; a.click();
+}
+function importData(e) {
+  var f = e.target.files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function(ev){
+    try {
+      var d = JSON.parse(ev.target.result);
+      if (d.teams)       S.teams       = d.teams;
+      if (d.powers)      S.powers      = d.powers;
+      if (d.rules)       S.rules       = d.rules;
+      if (d.ranking)     S.ranking     = d.ranking;
+      if (d.history)     S.history     = d.history;
+      if (d.playerStats) S.playerStats = d.playerStats;
+      save(); renderAll(); toast('Données importées !','ok');
+    } catch(x) { toast('Fichier invalide','err'); }
+  };
+  r.readAsText(f);
+}
+function clearAll() {
+  customConfirm('Effacer TOUTES les données (classes, équipes, matchs) ?', function(ok) {
+    if (!ok) return;
+    allClasses.forEach(function(cls){ localStorage.removeItem('pm4_cls_' + cls.id); });
+    localStorage.removeItem('pm4_global');
+    allClasses=[]; currentClassId=null;
+    S.teams=[]; S.ranking={}; S.history=[]; S.playerStats={};
+    S.powers={positive:{1:[],2:[],3:[]},negative:{1:[],2:[],3:[]}};
+    initDefaultPowers();
+    document.getElementById('homeClsName').textContent = 'Aucune classe — appuyez pour choisir';
+    showClassPicker();
+    toast('Toutes les données effacées','warn');
+  }, '⚠️', 'Tout effacer');
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// CLASS MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+function showClassPicker() {
+  document.getElementById('homeScreen').classList.remove('on');
+  document.getElementById('classPickScreen').classList.add('on');
+  renderClassList();
+}
+function renderClassList() {
+  var c2 = document.getElementById('clsList');
+  if (!allClasses.length) {
+    c2.innerHTML = '<div class="empty"><div class="ei">&#127979;</div><p>Aucune classe &#8212; cr&#233;ez-en une ci-dessous.</p></div>';
+    return;
+  }
+  var html = '';
+  allClasses.forEach(function(cls) {
+    var raw = localStorage.getItem('pm4_cls_' + cls.id);
+    var teamCount = 0, matchCount = 0;
+    if (raw) {
+      try { var d=JSON.parse(raw); teamCount=(d.teams||[]).length; matchCount=(d.history||[]).length; } catch(e){}
+    }
+    var isActive = cls.id === currentClassId;
+    var borderStyle = isActive ? 'border-color:var(--gold);' : '';
+    html += '<div class="cls-card" style="' + borderStyle + '" onclick="selectClass(' + "'" + cls.id + "'" + ')">';
+    html += '<div class="cls-ico">&#127979;</div>';
+    html += '<div style="flex:1">';
+    html += '<div class="cls-name">' + cls.name + '</div>';
+    var meta = teamCount + ' &#233;quipe(s) &middot; ' + matchCount + ' match(s)';
+    if (isActive) meta += ' &middot; <span style="color:var(--gold)">Active</span>';
+    html += '<div class="cls-meta">' + meta + '</div>';
+    html += '</div>';
+    html += '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">';
+    html += '<span class="cls-arr">&#9654;</span>';
+    html += '<button class="btn btn-xs btn-red" onclick="deleteClass(event,' + "'" + cls.id + "'" + ')">&#128465;</button>';
+    html += '</div>';
+    html += '</div>';
+  });
+  c2.innerHTML = html;
+}
+function createClass() {
+  var name = document.getElementById('newClsName').value.trim();
+  if (!name) { toast('Entrez un nom de classe','err'); return; }
+  var cls = {id:uid(), name:name, createdAt:new Date().toLocaleDateString('fr-FR')};
+  allClasses.push(cls);
+  saveGlobal();
+  document.getElementById('newClsName').value = '';
+  selectClass(cls.id);
+}
+function selectClass(classId) {
+  currentClassId = classId;
+  loadClass(classId);
+  var cls = allClasses.find(function(c){return c.id===classId;});
+  var clsName = cls ? cls.name : '?';
+  // Update home banner
+  document.getElementById('homeClsName').textContent = clsName;
+  // Switch to home
+  document.getElementById('classPickScreen').classList.remove('on');
+  document.getElementById('homeScreen').classList.add('on');
+  renderAll();
+  toast('Classe "' + clsName + '" chargée !','ok');
+}
+function deleteClass(e, classId) {
+  e.stopPropagation();
+  var cls = allClasses.find(function(c){return c.id===classId;});
+  if (!cls) return;
+  customConfirm('Supprimer la classe "' + cls.name + '" et toutes ses données ?', function(ok) {
+    if (!ok) return;
+    allClasses = allClasses.filter(function(c){return c.id!==classId;});
+    localStorage.removeItem('pm4_cls_' + classId);
+    if (currentClassId === classId) {
+      currentClassId = null;
+      S.teams=[]; S.ranking={}; S.history=[]; S.playerStats={};
+      document.getElementById('homeClsName').textContent = 'Aucune classe — appuyez pour choisir';
+    }
+    saveGlobal();
+    renderClassList();
+    toast('Classe supprimée','warn');
+  }, '🗑', 'Supprimer');
+}
+function goClassPick() {
+  document.getElementById('homeScreen').classList.remove('on');
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');});
+  document.getElementById('classPickScreen').classList.add('on');
+  renderClassList();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CUSTOM CONFIRM (replaces native confirm() which is blocked in PWA)
+// ═══════════════════════════════════════════════════════════════
+var _confirmCb = null;
+function customConfirm(msg, cb, icon, okLabel) {
+  icon = icon || '⚠️';
+  okLabel = okLabel || 'Confirmer';
+  document.getElementById('confirmIcon').textContent = icon;
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmOkBtn').textContent = okLabel;
+  _confirmCb = cb;
+  document.getElementById('confirmOv').classList.add('on');
+}
+function confirmResolve(ok) {
+  document.getElementById('confirmOv').classList.remove('on');
+  if (_confirmCb) { var cb = _confirmCb; _confirmCb = null; cb(ok); }
+}
+// ═══════════════════════════════════════════════════════════════
+// TOAST / NAV
+// ═══════════════════════════════════════════════════════════════
+function toast(msg, type) {
+  type = type || 'info';
+  var c = document.getElementById('toaster');
+  var t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(function() {
+    t.style.cssText = 'opacity:0;transform:translateX(32px);transition:all .28s';
+    setTimeout(function(){ t.remove(); }, 280);
+  }, 3000);
+}
+function goHome() {
+  if (!currentClassId) { showClassPicker(); return; }
+  document.getElementById('classPickScreen').classList.remove('on');
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');});
+  document.getElementById('homeScreen').classList.add('on');
+}
+function goScreen(id) {
+  if (!currentClassId && id !== 'reglagesScreen') {
+    toast('Choisissez une classe d\'abord !','warn');
+    showClassPicker(); return;
+  }
+  document.getElementById('classPickScreen').classList.remove('on');
+  document.getElementById('homeScreen').classList.remove('on');
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+  if (id==='classementScreen') renderRanking();
+  if (id==='statsScreen')      renderStats();
+  if (id==='reglagesScreen')   { renderTeamsList(); renderPowerList(); }
+}
+</script>
+</body>
+</html>
